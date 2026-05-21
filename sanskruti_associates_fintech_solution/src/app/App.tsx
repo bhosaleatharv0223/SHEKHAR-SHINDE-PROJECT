@@ -33,6 +33,12 @@ import { HospitalLoan } from './components/HospitalLoan';
 import { HospitalLoanForm } from './components/HospitalLoanForm';
 import { SchoolFinance } from './components/SchoolFinance';
 import { SchoolFinanceForm } from './components/SchoolFinanceForm';
+import { VehicleFinance } from './components/VehicleFinance';
+import { VehicleFinanceForm } from './components/VehicleFinanceForm';
+import { ConstructionLoan } from './components/ConstructionLoan';
+import { ConstructionLoanForm } from './components/ConstructionLoanForm';
+import { CCODFinance } from '../pages/CCODFinance';
+import CCODFinanceForm from '../pages/CCODFinanceForm';
 import { UserDashboard } from './components/UserDashboard';
 import { LeadsManagement } from './components/LeadsManagement';
 import { LeadDetails } from './components/LeadDetails';
@@ -127,6 +133,12 @@ function AppRoutes() {
         <Route path="/hospital-loan/apply" element={<PageShell><HospitalLoanForm /></PageShell>} />
         <Route path="/school-finance" element={<PageShell><SchoolFinance /></PageShell>} />
         <Route path="/school-finance/apply" element={<PageShell><SchoolFinanceForm /></PageShell>} />
+        <Route path="/vehicle-finance" element={<PageShell><VehicleFinance /></PageShell>} />
+        <Route path="/vehicle-finance/apply" element={<PageShell><VehicleFinanceForm /></PageShell>} />
+        <Route path="/construction-loan" element={<PageShell><ConstructionLoan /></PageShell>} />
+        <Route path="/construction-loan/apply" element={<PageShell><ConstructionLoanForm /></PageShell>} />
+        <Route path="/cc-od-finance" element={<PageShell><CCODFinance /></PageShell>} />
+        <Route path="/cc-od-finance/apply" element={<PageShell><CCODFinanceForm /></PageShell>} />
         <Route path="/emi-calculator" element={<EmiPage />} />
         <Route path="/dashboard" element={<PageShell><UserDashboard /></PageShell>} />
         <Route path="/loan-status-tracking" element={<LoanStatusTracking />} />

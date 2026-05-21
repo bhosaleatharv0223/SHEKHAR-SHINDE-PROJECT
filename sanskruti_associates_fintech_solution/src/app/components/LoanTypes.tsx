@@ -1,4 +1,4 @@
-import { Home, User, Briefcase, Car, Building2, CreditCard, Settings2, Factory, BookOpen, GraduationCap } from 'lucide-react';
+import { Home, User, Briefcase, Car, Building2, CreditCard, Settings2, Factory, BookOpen, GraduationCap, Truck } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useNavigation } from './AppRouter';
 
@@ -40,8 +40,8 @@ const loanTypes = [
   },
   {
     icon: CreditCard,
-    title: 'CC / OD',
-    description: 'Cash credit and overdraft facilities for working capital needs',
+    title: 'CC / OD Facility',
+    description: 'Flexible working capital finance. Pay interest only on amount utilized. ₹1 Lakh to ₹10 Crore limit.',
   },
   {
     icon: Settings2,
@@ -57,6 +57,16 @@ const loanTypes = [
     icon: BookOpen,
     title: 'School Finance',
     description: 'Pay school fees, admission, books, hostel and transport. From 6.85% p.a.',
+  },
+  {
+    icon: Truck,
+    title: 'Vehicle Finance',
+    description: 'Commercial, agricultural & construction vehicles. Fast approval & low rates.',
+  },
+  {
+    icon: Building2,
+    title: 'Construction Loan',
+    description: 'Finance construction projects, equipment & infrastructure. Flexible terms.',
   },
 ];
 
@@ -121,6 +131,24 @@ export function LoanTypes() {
 
     if (loanTitle === 'School Finance') {
       navigate('/school-finance');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (loanTitle === 'Vehicle Finance') {
+      navigate('/vehicle-finance');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (loanTitle === 'Construction Loan') {
+      navigate('/construction-loan');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (loanTitle === 'CC / OD Facility') {
+      navigate('/cc-od-finance');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
