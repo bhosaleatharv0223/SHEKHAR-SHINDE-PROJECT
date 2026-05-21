@@ -4,23 +4,13 @@ import { useNavigation } from './AppRouter';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { navigateTo, scrollToSection, currentPage } = useNavigation();
+  const { navigateTo, currentPage } = useNavigation();
 
-  const scrollToLoans = () => {
-    const scroll = () => {
-      document.getElementById('loan-services-section')?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    };
-
-    if (currentPage !== 'homepage') {
-      navigateTo('homepage');
-      setTimeout(scroll, 300);
-      return;
-    }
-
-    scroll();
+  const scrollToLoanServices = () => {
+    document.getElementById('loan-services-section')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   };
 
   const handleNavClick = (linkName: string) => {
@@ -29,9 +19,9 @@ export function Header() {
     } else if (linkName === 'Loan Services') {
       if (currentPage !== 'homepage') {
         navigateTo('homepage');
-        setTimeout(() => scrollToSection('loan-services'), 300);
+        setTimeout(() => scrollToLoanServices(), 300);
       } else {
-        scrollToSection('loan-services');
+        scrollToLoanServices();
       }
     } else if (linkName === 'EMI Calculator') {
       navigateTo('emi-calculator');
@@ -99,7 +89,7 @@ export function Header() {
             >
               Login / Register
             </button>
-            <button onClick={scrollToLoans} className="bg-[#16A34A] hover:bg-[#15803D] text-white rounded-lg transition-colors" style={{ padding: '10px 20px' }}>
+            <button onClick={scrollToLoanServices} className="bg-[#16A34A] hover:bg-[#15803D] text-white rounded-lg transition-colors" style={{ padding: '10px 20px' }}>
               Apply Now
             </button>
           </nav>
