@@ -13,7 +13,9 @@ export type PageType =
   | 'contact'
   | 'design-system'
   | 'site-map'
-  | 'loan-status-tracking';
+  | 'loan-status-tracking'
+  | 'hospital-loan'
+  | 'industry-finance';
 
 const pageToPath: Record<PageType, string> = {
   homepage: '/',
@@ -29,6 +31,8 @@ const pageToPath: Record<PageType, string> = {
   'design-system': '/design-system',
   'site-map': '/site-map',
   'loan-status-tracking': '/loan-status-tracking',
+  'hospital-loan': '/hospital-loan',
+  'industry-finance': '/industry-finance',
 };
 
 const pathToPage: Record<string, PageType> = Object.entries(pageToPath).reduce(
