@@ -44,11 +44,76 @@ export function AboutUs() {
       0% { background-position: -200% center; }
       100% { background-position: 200% center; }
     }
+    
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(30deg); }
+      100% { transform: translateX(100vw) translateY(100vh) rotate(30deg); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(2deg); }
+    }
+    
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.6), 0 0 60px rgba(34, 197, 94, 0.4); }
+    }
+    
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+    
+    .shine-effect {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .shine-effect::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shine 3s infinite;
+      pointer-events: none;
+    }
+    
+    .floating-card {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .glow-card {
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    
+    .sparkle {
+      animation: sparkle 2s ease-in-out infinite;
+    }
   `;
 
   return (
     <div className="min-h-screen" style={{ background: '#EFF6FF' }}>
       <style>{shimmerStyle}</style>
+      
+      {/* Floating Sparkles */}
+      <div className="fixed inset-0 pointer-events-none z-50">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-yellow-400 rounded-full sparkle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 2}s`
+            }}
+          />
+        ))}
+      </div>
       
       {/* Premium Hero Banner */}
       <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
@@ -408,14 +473,29 @@ export function AboutUs() {
           <h2 className="text-3xl lg:text-4xl text-[#1F2937] text-center mb-12">Our Loan Services</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer border border-gray-100"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  rotateY: 5,
+                  boxShadow: "0 25px 50px rgba(0,0,0,0.15)"
+                }}
+                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 shine-effect floating-card glow-card"
+                style={{
+                  animationDelay: `${index * 0.5}s`
+                }}
               >
-                <div className="text-5xl mb-4">{service.icon}</div>
-                <h3 className="text-xl text-[#1F2937] mb-2">{service.name}</h3>
+                <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">{service.icon}</div>
+                <h3 className="text-xl text-[#1F2937] mb-2 group-hover:text-[#2563EB] transition-colors">{service.name}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{service.desc}</p>
-              </div>
+                
+                {/* Shine overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+              </motion.div>
             ))}
           </div>
         </div>
@@ -427,16 +507,36 @@ export function AboutUs() {
             {whyChooseUs.map((item, index) => {
               const Icon = item.icon;
               return (
-                <div key={index} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl transition-all">
-                  <div
+                <motion.div 
+                  key={index} 
+                  initial={{ opacity: 0, y: 50, rotateY: -15 }}
+                  whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.15, duration: 0.6 }}
+                  whileHover={{ 
+                    scale: 1.08, 
+                    rotateY: 10,
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.15)"
+                  }}
+                  className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl transition-all shine-effect floating-card glow-card"
+                  style={{
+                    animationDelay: `${index * 0.8}s`
+                  }}
+                >
+                  <motion.div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
                     style={{ background: `${item.color}15` }}
+                    whileHover={{ rotate: 360, scale: 1.1 }}
+                    transition={{ duration: 0.6 }}
                   >
                     <Icon className="w-8 h-8" style={{ color: item.color }} />
-                  </div>
+                  </motion.div>
                   <h3 className="text-xl text-[#1F2937] mb-3">{item.title}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
-                </div>
+                  
+                  {/* Enhanced shine overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-2xl" />
+                </motion.div>
               );
             })}
           </div>
