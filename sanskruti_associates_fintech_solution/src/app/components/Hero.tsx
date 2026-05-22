@@ -103,8 +103,8 @@ export function Hero() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const customersData = useCountUp(10000, 2000, hasStarted);
-  const loansData = useCountUp(500, 2200, hasStarted);
+  const customersData = useCountUp(25000, 2000, hasStarted);
+  const loansData = useCountUp(1000, 2200, hasStarted);
   const partnersData = useCountUp(200, 2400, hasStarted);
 
   // Ripple effect handler
@@ -469,7 +469,7 @@ export function Hero() {
             {/* Trust badge */}
             <div className="trust-badge inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
               <CheckCircle2 className="trust-badge-icon w-5 h-5 text-[#16A34A]" />
-              <span className="text-sm">Trusted by 10000+ customers</span>
+              <span className="text-sm">Trusted by 25000+ customers</span>
             </div>
 
             {/* Headline with word-by-word reveal */}

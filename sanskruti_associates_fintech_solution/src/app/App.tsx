@@ -19,7 +19,7 @@ import LAP from './components/LAP';
 import LAPForm from './components/LAPForm';
 import MachineryLoan from './components/MachineryLoan';
 import MachineryLoanForm from './components/MachineryLoanForm';
-import { PersonalLoan } from './components/PersonalLoan';
+import { PersonalLoan } from '../pages/PersonalLoan'; // UPGRADED - Using new TSX file with animations
 import { PersonalLoanForm } from './components/PersonalLoanForm';
 import BusinessLoan from './components/BusinessLoan';
 import BusinessLoanForm from './components/BusinessLoanForm';

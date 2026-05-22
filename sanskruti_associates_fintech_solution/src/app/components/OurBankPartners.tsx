@@ -310,7 +310,7 @@ export function OurBankPartners() {
           background: linear-gradient(90deg, transparent, #38BDF8, #6366F1, #8B5CF6, #EC4899, #6366F1, transparent);
           background-size: 200% 100%;
           animation: glowlineMove 4s linear infinite;
-          box-shadow: 0 0 20px 4px #6366F1, 0 0 40px 8px rgba(139, 92, 246, 0.6);
+          box-shadow: 0 0 6px 1px rgba(99,102,241,0.25);
           pointer-events: none;
           z-index: 10;
         }

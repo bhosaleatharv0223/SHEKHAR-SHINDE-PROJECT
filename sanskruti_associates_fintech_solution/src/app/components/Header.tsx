@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useNavigation } from './AppRouter';
+import { motion } from "motion/react";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -54,22 +55,66 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div className="flex items-center justify-between h-full">
           {/* Logo Section */}
-          <button onClick={() => navigateTo('homepage')} className="flex items-center gap-3 group">
-            <img
-              src="/src/imports/ChatGPT_Image_May_3,_2026,_08_05_15_PM.png"
-              alt="Sanskruti Associates Logo"
-              className="h-12 w-auto"
-              style={{ mixBlendMode: 'lighten' }}
-            />
-            <div className="flex flex-col">
-              <span className="text-xl text-white leading-tight group-hover:text-[#16A34A] transition-colors">
+          <motion.button 
+            onClick={() => navigateTo('homepage')} 
+            className="flex items-center gap-3 group"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.div
+              className="relative"
+              animate={{ 
+                y: [0, -3, 0],
+                rotate: [0, 1, 0, -1, 0]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <motion.img
+                src="/src/imports/ChatGPT_Image_May_3,_2026,_08_05_15_PM.png"
+                alt="Sanskruti Associates Logo"
+                className="h-12 w-auto"
+                style={{ 
+                  mixBlendMode: 'lighten',
+                  filter: 'drop-shadow(0 4px 8px rgba(22,163,74,0.3))'
+                }}
+                whileHover={{
+                  filter: 'drop-shadow(0 6px 12px rgba(22,163,74,0.5)) brightness(1.1)'
+                }}
+              />
+            </motion.div>
+            <motion.div 
+              className="flex flex-col"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <motion.span 
+                className="text-xl text-white leading-tight group-hover:text-[#16A34A] transition-colors"
+                whileHover={{
+                  background: 'linear-gradient(90deg, #16A34A, #22C55E, #16A34A)',
+                  backgroundSize: '200% auto',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
                 Sanskruti Associates
-              </span>
-              <span className="text-xs italic leading-tight" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+              </motion.span>
+              <motion.span 
+                className="text-xs italic leading-tight" 
+                style={{ color: 'rgba(255, 255, 255, 0.6)' }}
+                animate={{ opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
                 Always With You
-              </span>
-            </div>
-          </button>
+              </motion.span>
+            </motion.div>
+          </motion.button>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
