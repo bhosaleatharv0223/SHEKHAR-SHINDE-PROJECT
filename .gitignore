@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.vite/
+.pnpm-store/
+
+*.log
+vite-err.log
+vite-live-err.log
+vite-live-out.log
+vite-out.log
+vite-personal-loan-err.log
+vite-personal-loan-out.log
+vite-run-err.log
+vite-run-out.log
