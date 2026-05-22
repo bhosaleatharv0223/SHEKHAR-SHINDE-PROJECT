@@ -1,6 +1,7 @@
 ﻿import { useState, useRef, useEffect } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
 import { Phone, MessageCircle, Mail, MapPin, ChevronDown, Send, Loader2, CheckCircle2 } from 'lucide-react';
+import { Footer } from './Footer';
 
 // TypeScript declaration for CSS custom properties
 declare module 'react' {
@@ -524,6 +525,9 @@ export function ContactUs() {
 
       {/* Section 7 - Need Instant Help Banner */}
       <InstantHelpBanner />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
@@ -1391,6 +1395,7 @@ function FAQSection({ activeFaq, setActiveFaq }: any) {
 
   return (
     <motion.div
+      id="faq-section"
       ref={ref}
       initial={{ y: 30, opacity: 0 }}
       animate={isInView ? { y: 0, opacity: 1 } : {}}

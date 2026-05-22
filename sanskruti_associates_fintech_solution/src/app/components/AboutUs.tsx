@@ -6,6 +6,7 @@ import {
   Home, User, Briefcase, GraduationCap, Heart, Car, CreditCard, Settings, Factory, School, Truck, HardHat, ArrowRight, Sparkles,
   Shield, Clock, CheckCircle2, HeartHandshake, Globe, BadgeCheck, Navigation, ExternalLink, Quote
 } from 'lucide-react';
+import { Footer } from './Footer';
 
 const services = [
   { icon: 'SA', name: 'Home Loan', desc: 'Affordable housing loans with best rates' },
@@ -2126,7 +2127,7 @@ export function AboutUs() {
             }}
             className="mb-8 relative"
           >
-            <div className="relative w-28 h-28 md:w-36 md:h-36">
+            <div className="relative" style={{ width: '300px', height: '300px' }}>
               {/* Rotating ring around logo */}
               <motion.div
                 className="absolute inset-0 rounded-full border-2 border-green-400/40"
@@ -2142,112 +2143,45 @@ export function AboutUs() {
 
               {/* Second ring (opposite direction) */}
               <motion.div
-                className="absolute inset-2 rounded-full border border-blue-400/30"
-                animate={{ rotate: -360 }}
-                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                className="absolute rounded-full border border-blue-400/30"
                 style={{
+                  inset: '18px',
                   borderTopColor: 'transparent',
                   borderRightColor: '#2563eb',
                   borderBottomColor: 'transparent',
                   borderLeftColor: '#16a34a'
                 }}
+                animate={{ rotate: -360 }}
+                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
               />
 
               {/* Logo image center */}
-              <div className="absolute inset-4 rounded-full overflow-hidden bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+              <div 
+                className="absolute rounded-full overflow-hidden bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20"
+                style={{ inset: '36px' }}
+              >
                 <motion.div
                   className="w-full h-full flex items-center justify-center rounded-full relative"
                   style={{
-                    background: 'radial-gradient(circle, rgba(34, 197, 94, 0.95) 0%, rgba(22, 163, 74, 0.9) 100%)'
+                    background: '#1a6b2f',
+                    overflow: 'hidden'
                   }}
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {/* Sanskruti Associates Logo */}
-                  <motion.div
-                    className="relative w-full h-full flex flex-col items-center justify-center text-white"
-                    animate={{
-                      scale: [1, 1.05, 1],
+                  {/* Official Sanskruti Associates Logo */}
+                  <img
+                    src="/bank logos/Main_logo.jpeg"
+                    alt="Sanskruti Associates Logo"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      objectPosition: 'center center',
+                      display: 'block',
+                      transform: 'scale(0.85)',
                     }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    {/* Hand with Money Icon */}
-                    <motion.div
-                      className="text-2xl md:text-3xl mb-1"
-                      animate={{
-                        rotateY: [0, 10, -10, 0],
-                      }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      🤝
-                    </motion.div>
-
-                    {/* Dollar/Rupee Symbol */}
-                    <motion.div
-                      className="absolute top-2 right-2 text-yellow-300 text-lg"
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        rotate: [0, 15, -15, 0]
-                      }}
-                      transition={{
-                        duration: 2.5,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      ₹
-                    </motion.div>
-
-                    {/* Company Initials */}
-                    <motion.div
-                      className="text-sm md:text-base font-bold tracking-wider"
-                      animate={{
-                        textShadow: [
-                          "0 0 5px rgba(255,255,255,0.5)",
-                          "0 0 15px rgba(255,255,255,0.8)",
-                          "0 0 5px rgba(255,255,255,0.5)"
-                        ]
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      SANSKRUTI
-                    </motion.div>
-
-                    {/* Floating particles around logo */}
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute w-1 h-1 bg-yellow-300 rounded-full"
-                        style={{
-                          left: `${20 + Math.cos(i * 60 * Math.PI / 180) * 30}%`,
-                          top: `${20 + Math.sin(i * 60 * Math.PI / 180) * 30}%`,
-                        }}
-                        animate={{
-                          scale: [0, 1, 0],
-                          opacity: [0, 1, 0],
-                          rotate: [0, 360]
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          delay: i * 0.3,
-                          ease: "easeInOut"
-                        }}
-                      />
-                    ))}
-                  </motion.div>
+                  />
 
                   {/* Animated border glow */}
                   <motion.div
@@ -3155,7 +3089,7 @@ export function AboutUs() {
               className="text-center mt-16"
             >
               <p className="text-gray-400 text-sm mb-5">
-                Join 10,000+ satisfied customers across Maharashtra
+                Join 25,000+ satisfied customers across Maharashtra
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <button
@@ -3567,7 +3501,7 @@ export function AboutUs() {
               transition={{ delay: 0.75, duration: 0.6 }}
               className="text-gray-500 text-lg max-w-2xl mx-auto leading-relaxed"
             >
-              10,000+ happy customers across Maharashtra trust Sanskruti Associates for their financial needs.
+              25,000+ happy customers across Maharashtra trust Sanskruti Associates for their financial needs.
             </motion.p>
             {/* Trust badges */}
             <motion.div
@@ -3926,7 +3860,7 @@ export function AboutUs() {
             className="flex flex-wrap justify-center gap-8"
           >
             {[
-              { stat: "10,000+", label: "Happy Customers" },
+              { stat: "25,000+", label: "Happy Customers" },
               { stat: "₹500Cr+", label: "Loans Disbursed" },
               { stat: "200+",    label: "Bank Partners" },
               { stat: "15+",     label: "Years Experience" },
@@ -3941,81 +3875,7 @@ export function AboutUs() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0f172a] text-gray-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div>
-              <div className="text-2xl text-white mb-4">Sanskruti Associates</div>
-              <p className="text-sm mb-6 leading-relaxed">
-                Your trusted partner for all loan solutions. We help you find the best deals from multiple banks with expert guidance.
-              </p>
-              <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-[#2563EB] rounded-lg flex items-center justify-center transition-colors">
-                  <Facebook className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-[#2563EB] rounded-lg flex items-center justify-center transition-colors">
-                  <Twitter className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-[#2563EB] rounded-lg flex items-center justify-center transition-colors">
-                  <Linkedin className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-[#2563EB] rounded-lg flex items-center justify-center transition-colors">
-                  <Instagram className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-white mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Our Services</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">EMI Calculator</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Apply Now</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Contact Us</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white mb-4">Loan Services</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Home Loan</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Personal & Personal & Business Loan</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Personal & Business Loan</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Car Loan</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Machinery Loan</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white mb-4">Contact Info</h4>
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-[#2563EB] flex-shrink-0 mt-0.5" />
-                  <span>Shop No. 11 Second Floor, Subhadra Mall, Front of Relince Smart MIDC, Baramati Dist-Pune 413133</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-[#2563EB] flex-shrink-0" />
-                  <a href="tel:+917758969798" className="hover:text-[#2563EB] transition-colors">+91 7758 96 9798</a>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-[#2563EB] flex-shrink-0" />
-                  <a href="mailto:sanskruti.sss1108@gmail.com" className="hover:text-[#2563EB] transition-colors">sanskruti.sss1108@gmail.com</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-            <div>© 2026 Sanskruti Associates. All rights reserved.</div>
-            <div className="flex gap-6">
-              <a href="#" className="hover:text-[#2563EB] transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-[#2563EB] transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-[#2563EB] transition-colors">Disclaimer</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -14,6 +14,16 @@ export function Header() {
     });
   };
 
+  const handleApplyNowClick = () => {
+    if (currentPage !== 'homepage') {
+      navigateTo('homepage');
+      setTimeout(() => scrollToLoanServices(), 300);
+    } else {
+      scrollToLoanServices();
+    }
+    setMobileMenuOpen(false);
+  };
+
   const handleNavClick = (linkName: string) => {
     if (linkName === 'Home') {
       navigateTo('homepage');
@@ -134,7 +144,7 @@ export function Header() {
             >
               Login / Register
             </button>
-            <button onClick={scrollToLoanServices} className="bg-[#16A34A] hover:bg-[#15803D] text-white rounded-lg transition-colors" style={{ padding: '10px 20px' }}>
+            <button onClick={handleApplyNowClick} className="bg-[#16A34A] hover:bg-[#15803D] text-white rounded-lg transition-colors" style={{ padding: '10px 20px' }}>
               Apply Now
             </button>
           </nav>
@@ -172,10 +182,7 @@ export function Header() {
             <button
               className="bg-[#16A34A] hover:bg-[#15803D] text-white rounded-lg transition-colors w-full"
               style={{ padding: '10px 20px' }}
-              onClick={() => {
-                navigateTo('loan-application');
-                setMobileMenuOpen(false);
-              }}
+              onClick={handleApplyNowClick}
             >
               Apply Now
             </button>

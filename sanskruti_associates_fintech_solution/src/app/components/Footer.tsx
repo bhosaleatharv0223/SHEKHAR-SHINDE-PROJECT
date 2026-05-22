@@ -1,9 +1,12 @@
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 
 export function Footer() {
   const [inView, setInView] = useState(false);
   const footerRef = useRef<HTMLElement>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -21,6 +24,59 @@ export function Footer() {
 
     return () => observer.disconnect();
   }, []);
+
+  // Smart scroll helper — navigates to page first if needed, then scrolls to section
+  const navigateToSection = (path: string, sectionId?: string) => {
+    if (!sectionId) {
+      navigate(path);
+      return;
+    }
+
+    if (location.pathname === path) {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    // Navigate first, then wait for the element to exist in the DOM
+    navigate(path);
+
+    let attempts = 0;
+    const tryScroll = () => {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (attempts < 10) {
+        attempts++;
+        setTimeout(tryScroll, 100); // retry every 100ms, up to 1 second
+      }
+    };
+    setTimeout(tryScroll, 200);
+  };
+
+  // Loan services with correct routes
+  const loanServices = [
+    { label: 'Home Loan', path: '/home-loan' },
+    { label: 'Loan Against Property', path: '/lap' },
+    { label: 'Personal Loan', path: '/personal-loan' },
+    { label: 'Business Loan', path: '/business-loan' },
+    { label: 'Educational Loan', path: '/education-loan' },
+    { label: 'Hospital Finance', path: '/hospital-loan' },
+    { label: 'Car Loan', path: '/car-loan' },
+    { label: 'Vehicle Finance', path: '/vehicle-finance' },
+    { label: 'CC / OD', path: '/cc-od-finance' },
+    { label: 'Machinery Loan', path: '/machinery-loan' },
+    { label: 'Construction Loan', path: '/construction-loan' },
+    { label: 'Industry Finance', path: '/industry-finance' },
+    { label: 'School Finance', path: '/school-finance' },
+  ];
+
+  // Social media links
+  const socialLinks = {
+    facebook: 'https://www.facebook.com',
+    twitter: 'https://www.twitter.com',
+    linkedin: 'https://www.linkedin.com',
+    instagram: 'https://www.instagram.com',
+  };
 
   return (
     <footer ref={footerRef} className="relative bg-[#1F2937] text-gray-300 overflow-hidden">
@@ -188,30 +244,34 @@ export function Footer() {
                   Your trusted partner for all loan solutions. We help you find the best deals from multiple banks with expert guidance.
                 </p>
                 <div className="flex gap-3">
-                  <a
-                    href="#"
+                  <div
+                    onClick={() => window.open(socialLinks.facebook, '_blank', 'noopener,noreferrer')}
                     className="social-icon w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"
+                    style={{ cursor: 'pointer' }}
                   >
                     <Facebook className="w-5 h-5" />
-                  </a>
-                  <a
-                    href="#"
+                  </div>
+                  <div
+                    onClick={() => window.open(socialLinks.twitter, '_blank', 'noopener,noreferrer')}
                     className="social-icon w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"
+                    style={{ cursor: 'pointer' }}
                   >
                     <Twitter className="w-5 h-5" />
-                  </a>
-                  <a
-                    href="#"
+                  </div>
+                  <div
+                    onClick={() => window.open(socialLinks.linkedin, '_blank', 'noopener,noreferrer')}
                     className="social-icon w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"
+                    style={{ cursor: 'pointer' }}
                   >
                     <Linkedin className="w-5 h-5" />
-                  </a>
-                  <a
-                    href="#"
+                  </div>
+                  <div
+                    onClick={() => window.open(socialLinks.instagram, '_blank', 'noopener,noreferrer')}
                     className="social-icon w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"
+                    style={{ cursor: 'pointer' }}
                   >
                     <Instagram className="w-5 h-5" />
-                  </a>
+                  </div>
                 </div>
               </div>
 
@@ -219,71 +279,17 @@ export function Footer() {
               <div className={inView ? 'fade-in-col-2' : ''}>
                 <h4 className="text-white mb-4 font-semibold">Loan Services</h4>
                 <ul className="space-y-2 text-sm">
-                  <li>
-                    <a href="#" className="footer-link">
-                      Home Loan
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Loan Against Property
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Personal Loan
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Business Loan
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Educational Loan
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Hospital Finance
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Car Loan
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Vehicle Finance
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      CC / OD
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Machinery Loan
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Construction Loan
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      Industry Finance
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="footer-link">
-                      School Finance
-                    </a>
-                  </li>
+                  {loanServices.map((loan) => (
+                    <li key={loan.label}>
+                      <span
+                        onClick={() => navigate(loan.path)}
+                        className="footer-link"
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {loan.label}
+                      </span>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
@@ -292,34 +298,63 @@ export function Footer() {
                 <h4 className="text-white mb-4 font-semibold">Quick Links</h4>
                 <ul className="space-y-2 text-sm">
                   <li>
-                    <a href="#" className="footer-link">
+                    <span
+                      onClick={() => navigate('/about')}
+                      className="footer-link"
+                      style={{ cursor: 'pointer' }}
+                    >
                       About Us
-                    </a>
+                    </span>
                   </li>
                   <li>
-                    <a href="#" className="footer-link">
+                    <span
+                      onClick={() => navigate('/emi-calculator')}
+                      className="footer-link"
+                      style={{ cursor: 'pointer' }}
+                    >
                       EMI Calculator
-                    </a>
+                    </span>
                   </li>
                   <li>
-                    <a href="#" className="footer-link">
+                    <span
+                      onClick={() => navigateToSection('/', 'loan-services-section')}
+                      className="footer-link"
+                      style={{ cursor: 'pointer' }}
+                    >
                       Compare Loans
-                    </a>
+                    </span>
                   </li>
                   <li>
-                    <a href="#" className="footer-link">
+                    <span
+                      onClick={() => navigateToSection('/', 'loan-services-section')}
+                      className="footer-link"
+                      style={{ cursor: 'pointer' }}
+                    >
                       Check Eligibility
-                    </a>
+                    </span>
                   </li>
                   <li>
-                    <a href="#" className="footer-link">
+                    <span
+                      onClick={() => navigateToSection('/contact', 'faq-section')}
+                      className="footer-link"
+                      style={{ cursor: 'pointer' }}
+                    >
                       FAQs
-                    </a>
+                    </span>
                   </li>
                   <li>
-                    <a href="#" className="footer-link">
+                    <span
+                      onClick={() => {
+                        navigate('/contact');
+                        setTimeout(() => {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }, 100);
+                      }}
+                      className="footer-link"
+                      style={{ cursor: 'pointer' }}
+                    >
                       Contact Us
-                    </a>
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -330,7 +365,13 @@ export function Footer() {
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start gap-3">
                     <MapPin className="w-5 h-5 text-[#4A90E2] flex-shrink-0 mt-0.5" />
-                    <span>Baramati Dist-Pune 413133</span>
+                    <span
+                      onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=Baramati+Dist+Pune+413133', '_blank', 'noopener,noreferrer')}
+                      className="footer-link"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      Baramati Dist-Pune 413133
+                    </span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Phone className="contact-icon w-5 h-5 text-[#4A90E2] flex-shrink-0" />
@@ -358,15 +399,27 @@ export function Footer() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
               <div>© 2026 Sanskruti Associates. All rights reserved.</div>
               <div className="flex gap-6">
-                <a href="#" className="footer-link">
+                <span
+                  onClick={() => {}}
+                  className="footer-link"
+                  style={{ cursor: 'pointer' }}
+                >
                   Privacy Policy
-                </a>
-                <a href="#" className="footer-link">
+                </span>
+                <span
+                  onClick={() => {}}
+                  className="footer-link"
+                  style={{ cursor: 'pointer' }}
+                >
                   Terms of Service
-                </a>
-                <a href="#" className="footer-link">
+                </span>
+                <span
+                  onClick={() => {}}
+                  className="footer-link"
+                  style={{ cursor: 'pointer' }}
+                >
                   Disclaimer
-                </a>
+                </span>
               </div>
             </div>
           </div>
