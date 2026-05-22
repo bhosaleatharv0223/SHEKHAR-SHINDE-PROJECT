@@ -256,12 +256,22 @@ export function Footer() {
                   </li>
                   <li>
                     <a href="#" className="footer-link">
+                      Vehicle Finance
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="footer-link">
                       CC / OD
                     </a>
                   </li>
                   <li>
                     <a href="#" className="footer-link">
                       Machinery Loan
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="footer-link">
+                      Construction Loan
                     </a>
                   </li>
                   <li>

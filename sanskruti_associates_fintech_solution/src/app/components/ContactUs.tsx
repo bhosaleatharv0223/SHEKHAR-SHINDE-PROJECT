@@ -1,6 +1,73 @@
-import { useState } from 'react';
-import { Home as HomeIcon, Phone, MessageCircle, Mail, MapPin, Clock, ChevronRight, ChevronDown, Send, Facebook, Instagram, Linkedin, Youtube, Twitter, CheckCircle2, Map } from 'lucide-react';
+﻿import { useState, useRef } from 'react';
+import { motion, useInView, AnimatePresence } from 'motion/react';
+import { Phone, MessageCircle, Mail, MapPin, ChevronDown, Send, Loader2, CheckCircle2 } from 'lucide-react';
 
+// TypeScript declaration for CSS custom properties
+declare module 'react' {
+  interface CSSProperties {
+    '--card-border-color'?: string;
+    '--card-glow-color'?: string;
+  }
+}
+
+// Google Maps locations
+const branchLocations: Record<string, string> = {
+  baramati: 'https://www.google.com/maps/search/?api=1&query=Shop+No.+11+Second+Floor+Subhadra+Mall+Front+of+Reliance+Smart+MIDC+Baramati+Dist+Pune+413133',
+  pune: 'https://www.google.com/maps/search/?api=1&query=Pune+Maharashtra',
+  mumbai: 'https://www.google.com/maps/search/?api=1&query=Mumbai+Maharashtra',
+  kolhapur: 'https://www.google.com/maps/search/?api=1&query=Kolhapur+Maharashtra',
+  saswad: 'https://www.google.com/maps/search/?api=1&query=Saswad+Maharashtra',
+  tembhurni: 'https://www.google.com/maps/search/?api=1&query=Tembhurni+Maharashtra',
+};
+
+const openMap = (key: string) => {
+  window.open(branchLocations[key], '_blank', 'noopener,noreferrer');
+};
+
+// Last updated: 2026-05-22 - Added Saswad and Tembhurni branches
+
+// Logo configuration interface
+interface ContactLogoConfig {
+  src: string;
+  alt: string;
+  brandColor: string;
+}
+
+// Logo configurations
+const logoConfigs: Record<string, ContactLogoConfig> = {
+  call: {
+    src: '/Contact_Us_Logos/call_logo.png',
+    alt: 'Call Us',
+    brandColor: '#16a34a',
+  },
+  whatsapp: {
+    src: '/Contact_Us_Logos/whatsapp_logo.png',
+    alt: 'WhatsApp',
+    brandColor: '#25d366',
+  },
+  email: {
+    src: '/Contact_Us_Logos/Email_logo.png',
+    alt: 'Email',
+    brandColor: '#2563eb',
+  },
+  office: {
+    src: '/Contact_Us_Logos/office_logo.png',
+    alt: 'Our Office',
+    brandColor: '#2563eb',
+  },
+  branches: {
+    src: '/Contact_Us_Logos/branches_logo.png',
+    alt: 'Branches',
+    brandColor: '#2563eb',
+  },
+  businessHours: {
+    src: '/Contact_Us_Logos/business_hours_logo.png',
+    alt: 'Business Hours',
+    brandColor: '#2563eb',
+  },
+};
+
+// Data
 const faqs = [
   { q: 'What documents are required?', a: 'Basic documents include Aadhaar card, PAN card, income proof (salary slips/ITR), bank statements for last 6 months, and property documents (for home/LAP loans).' },
   { q: 'How long does approval take?', a: 'Typically, loan approval takes 2-3 working days after all documents are submitted and verified. For urgent cases, we can expedite the process.' },
@@ -12,12 +79,13 @@ const faqs = [
 const services = [
   'Home Loan',
   'Loan Against Property',
-  'Personal & Personal & Business Loan',
+  'Personal & Business Loan',
   'Car Loan',
   'CC / OD',
   'Machinery Loan',
 ];
 
+// Updated branches list with Saswad and Tembhurni
 const branches = [
   {
     name: 'Baramati',
@@ -39,7 +107,50 @@ const branches = [
     tag: 'BRANCH',
     address: 'Kolhapur, Maharashtra',
   },
+  {
+    name: 'Saswad',
+    tag: 'BRANCH',
+    address: 'Saswad, Maharashtra',
+  },
+  {
+    name: 'Tembhurni',
+    tag: 'BRANCH',
+    address: 'Tembhurni, Maharashtra',
+  },
 ];
+
+// Logo Circle Component
+const LogoCircle = ({ config, size = 88, objectFit = 'cover' }: { config: ContactLogoConfig; size?: number; objectFit?: 'cover' | 'contain' }) => {
+  return (
+    <div
+      className="logo-circle"
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: '50%',
+        overflow: 'hidden',
+        position: 'relative',
+        flexShrink: 0,
+        background: '#ffffff',
+        border: '2px solid #e2e8f0',
+        transition: 'transform 0.3s ease',
+      }}
+    >
+      <img
+        src={config.src}
+        alt={config.alt}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: objectFit,
+          objectPosition: 'center',
+          display: 'block',
+          padding: objectFit === 'contain' ? '8px' : '0',
+        }}
+      />
+    </div>
+  );
+};
 
 export function ContactUs() {
   const [formData, setFormData] = useState({
@@ -51,431 +162,1256 @@ export function ContactUs() {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
+    setSubmitting(true);
+    setTimeout(() => {
+      setSubmitting(false);
+      setSubmitted(true);
+      setFormData({
+        name: '',
+        phone: '',
+        email: '',
+        loanType: '',
+        loanAmount: '',
+        message: '',
+      });
+      setTimeout(() => setSubmitted(false), 5000);
+    }, 1500);
   };
 
-  const isWeekday = () => {
-    const day = new Date().getDay();
-    return day >= 1 && day <= 5;
+  const handleFieldChange = (name: string, value: string) => {
+    setFormData({ ...formData, [name]: value });
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#EFF6FF' }}>
-      {/* Hero Banner */}
-      <section
-        className="relative h-[250px] flex items-center justify-center text-white overflow-hidden"
-        style={{
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)',
-        }}
-      >
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-20 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-20 w-80 h-80 bg-[#16A34A] rounded-full blur-3xl"></div>
-        </div>
+    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+      <style>{`
+        /* Typography System */
+        .page-title {
+          font-size: clamp(2rem, 4vw, 3rem);
+          font-weight: 800;
+          letter-spacing: -0.03em;
+          color: #0f172a;
+        }
 
-        <div className="relative z-10 text-center max-w-4xl px-4">
-          <div className="flex items-center justify-center gap-2 text-sm mb-4 text-blue-200">
-            <HomeIcon className="w-4 h-4" />
-            <span>Home</span>
-            <ChevronRight className="w-4 h-4" />
-            <span>Contact Us</span>
-          </div>
-          <h1 className="text-4xl lg:text-5xl mb-4">Contact Us</h1>
-          <p className="text-xl text-blue-100">We are here to help you get the best loan deal</p>
-        </div>
-      </section>
+        .section-heading {
+          font-size: 1.1rem;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          color: #1e293b;
+        }
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Quick Contact Cards */}
-        <div className="grid md:grid-cols-3 gap-6 -mt-12 mb-16 relative z-10">
-          <div className="bg-white rounded-2xl p-8 shadow-xl text-center">
-            <div className="w-16 h-16 bg-[#16A34A] bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Phone className="w-8 h-8 text-[#16A34A]" />
-            </div>
-            <h3 className="text-xl text-[#1F2937] mb-2">Call Us</h3>
-            <p className="text-lg text-[#1F2937] mb-1">7758 96 9798 / 9921 37 4565</p>
-            <p className="text-sm text-gray-500 mb-4">Mon-Sat: 9AM to 7PM</p>
-            <a href="tel:+917758969798" className="block w-full bg-[#16A34A] hover:bg-[#15803D] text-white py-3 rounded-lg transition-colors">
-              Call Now
-            </a>
-          </div>
+        .card-title {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #0f172a;
+        }
 
-          <div className="bg-white rounded-2xl p-8 shadow-xl text-center">
-            <div className="w-16 h-16 bg-[#25D366] bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageCircle className="w-8 h-8 text-[#25D366]" />
-            </div>
-            <h3 className="text-xl text-[#1F2937] mb-2">WhatsApp Us</h3>
-            <p className="text-lg text-[#1F2937] mb-1">7758 96 9798</p>
-            <p className="text-sm text-gray-500 mb-4">Quick response guaranteed</p>
-            <a href="https://wa.me/917758969798" className="block w-full bg-[#25D366] hover:bg-[#20BA5A] text-white py-3 rounded-lg transition-colors">
-              Chat Now
-            </a>
-          </div>
+        .card-data {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #1e293b;
+        }
 
-          <div className="bg-white rounded-2xl p-8 shadow-xl text-center">
-            <div className="w-16 h-16 bg-[#2563EB] bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Mail className="w-8 h-8 text-[#2563EB]" />
-            </div>
-            <h3 className="text-xl text-[#1F2937] mb-2">Email Us</h3>
-            <p className="text-lg text-[#1F2937] mb-1">sanskruti.sss1108@gmail.com</p>
-            <p className="text-sm text-gray-500 mb-4">Reply within 24 hours</p>
-            <a href="mailto:sanskruti.sss1108@gmail.com" className="block w-full bg-[#2563EB] hover:bg-[#1E40AF] text-white py-3 rounded-lg transition-colors">
-              Send Email
-            </a>
-          </div>
-        </div>
+        .card-support {
+          font-size: 0.8rem;
+          font-weight: 400;
+          color: #64748b;
+          letter-spacing: 0.02em;
+        }
 
-        {/* Main Content - Two Columns */}
-        <div className="grid lg:grid-cols-5 gap-8 mb-16">
-          {/* Left Column - Contact Form */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-xl">
-              <h2 className="text-3xl text-[#1F2937] mb-8">Send Us a Message</h2>
+        .branch-name {
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #1e293b;
+        }
 
-              {!submitted ? (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm text-[#374151] mb-2">Full Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full h-12 px-4 rounded-lg border border-gray-300 focus:border-[#2563EB] focus:outline-none"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
+        .branch-address {
+          font-size: 0.8rem;
+          color: #64748b;
+          line-height: 1.5;
+        }
 
-                  <div>
-                    <label className="block text-sm text-[#374151] mb-2">Phone Number *</label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full h-12 px-4 rounded-lg border border-gray-300 focus:border-[#2563EB] focus:outline-none"
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
+        .faq-question {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: #1e293b;
+        }
 
-                  <div>
-                    <label className="block text-sm text-[#374151] mb-2">Email Address</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full h-12 px-4 rounded-lg border border-gray-300 focus:border-[#2563EB] focus:outline-none"
-                      placeholder="Enter your email"
-                    />
-                  </div>
+        .form-label {
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #374151;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
 
-                  <div>
-                    <label className="block text-sm text-[#374151] mb-2">Loan Type</label>
-                    <select
-                      value={formData.loanType}
-                      onChange={(e) => setFormData({ ...formData, loanType: e.target.value })}
-                      className="w-full h-12 px-4 rounded-lg border border-gray-300 focus:border-[#2563EB] focus:outline-none"
-                    >
-                      <option value="">Select loan type</option>
-                      {services.map((service) => (
-                        <option key={service}>{service}</option>
-                      ))}
-                    </select>
-                  </div>
+        /* Unified Border System for ALL Cards */
+        .contact-card-base {
+          border: 2px solid var(--card-border-color);
+          border-radius: 20px;
+          background: #ffffff;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+          transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                      box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                      border-color 0.35s ease;
+          position: relative;
+          overflow: hidden;
+        }
 
-                  <div>
-                    <label className="block text-sm text-[#374151] mb-2">Loan Amount</label>
-                    <select
-                      value={formData.loanAmount}
-                      onChange={(e) => setFormData({ ...formData, loanAmount: e.target.value })}
-                      className="w-full h-12 px-4 rounded-lg border border-gray-300 focus:border-[#2563EB] focus:outline-none"
-                    >
-                      <option value="">Select loan amount</option>
-                      <option>Under 5L</option>
-                      <option>5L - 25L</option>
-                      <option>25L - 1Cr</option>
-                      <option>Above 1Cr</option>
-                    </select>
-                  </div>
+        .contact-card-base::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          height: 4px;
+          background: var(--card-border-color);
+          border-radius: 20px 20px 0 0;
+          transform-origin: center;
+          transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-                  <div>
-                    <label className="block text-sm text-[#374151] mb-2">Message</label>
-                    <textarea
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      rows={4}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#2563EB] focus:outline-none resize-none"
-                      placeholder="Describe your requirement..."
-                    ></textarea>
-                  </div>
+        .contact-card-base:hover::before {
+          transform: scaleX(0.92) scaleY(1.3);
+        }
 
-                  <button
-                    type="submit"
-                    className="w-full h-14 bg-[#16A34A] hover:bg-[#15803D] text-white rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
-                  >
-                    Send Message
-                    <Send className="w-5 h-5" />
-                  </button>
-                </form>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="w-20 h-20 bg-[#16A34A] rounded-full flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle2 className="w-12 h-12 text-white" />
-                  </div>
-                  <h3 className="text-2xl text-[#1F2937] mb-3">Message sent successfully!</h3>
-                  <p className="text-gray-600">We will contact you within 2 hours</p>
-                </div>
-              )}
-            </div>
-          </div>
+        .contact-card-base:hover {
+          transform: translateY(-8px) scale(1.02);
+          border-color: var(--card-border-color);
+          box-shadow:
+            0 0 0 2px var(--card-border-color),
+            0 24px 60px rgba(0,0,0,0.25),
+            0 12px 24px rgba(0,0,0,0.20),
+            0 4px 8px rgba(0,0,0,0.15);
+        }
 
-          {/* Right Column */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Office Address */}
-            <div className="bg-white rounded-2xl p-6 shadow-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#2563EB] bg-opacity-20 rounded-full flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-[#2563EB]" />
-                </div>
-                <h3 className="text-xl text-[#1F2937]">Our Office</h3>
-              </div>
-              <p className="text-gray-700 mb-4">
-                Shop No. 11 Second Floor,<br />
-                Subhadra Mall, Front of Relince Smart MIDC,<br />
-                Baramati Dist-Pune 413133
-              </p>
+        /* Branch Row Hover Effects */
+        .branch-row {
+          border: 1px solid #e2e8f0;
+          border-radius: 10px;
+          border-left: 3px solid transparent;
+          padding: 0.75rem 1rem;
+          transition: border-left-color 0.25s ease, background 0.25s ease, transform 0.2s ease;
+          cursor: pointer;
+        }
 
-              <div className="bg-blue-100 rounded-lg h-48 flex items-center justify-center mb-4">
-                <Map className="w-16 h-16 text-[#2563EB]" />
-              </div>
+        .branch-row:hover {
+          border-left-color: #0891b2;
+          background: #f0f9ff;
+          transform: translateX(4px);
+        }
 
-              <button className="w-full border-2 border-[#2563EB] text-[#2563EB] py-3 rounded-lg hover:bg-blue-50 transition-colors">
-                Get Directions
-              </button>
-            </div>
+        .branch-row:hover .branch-name {
+          color: #0891b2;
+          transition: color 0.2s ease;
+        }
 
-            {/* Branches */}
-            <div className="bg-white rounded-2xl p-6 shadow-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#2563EB] bg-opacity-20 rounded-full flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-[#2563EB]" />
-                </div>
-                <h3 className="text-xl text-[#1F2937]">Branches</h3>
-              </div>
+        .badge-head-office {
+          font-size: 0.65rem;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          padding: 3px 10px;
+          border-radius: 6px;
+          background: #eff6ff;
+          color: #2563eb;
+          border: 1px solid #bfdbfe;
+        }
 
-              <div className="grid gap-3">
-                {branches.map((branch) => (
-                  <div key={branch.name} className="border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between gap-3 mb-2">
-                      <h4 className="text-[#1F2937]">{branch.name}</h4>
-                      <span className="text-xs text-[#2563EB] bg-blue-50 px-2 py-1 rounded-full">{branch.tag}</span>
-                    </div>
-                    <p className="text-sm text-gray-600 leading-relaxed">{branch.address}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+        .badge-branch {
+          font-size: 0.65rem;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          padding: 3px 10px;
+          border-radius: 6px;
+          background: #f8fafc;
+          color: #64748b;
+          border: 1px solid #e2e8f0;
+        }
 
-            {/* Business Hours */}
-            <div className="bg-white rounded-2xl p-6 shadow-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#16A34A] bg-opacity-20 rounded-full flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-[#16A34A]" />
-                </div>
-                <h3 className="text-xl text-[#1F2937]">Business Hours</h3>
-              </div>
+        /* Gentle Float Animation */
+        @keyframes gentleFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+        }
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-700">Monday - Friday</span>
-                  <span className="text-[#1F2937] flex items-center gap-2">
-                    9:00 AM - 7:00 PM
-                    <span className="text-[#16A34A]">âœ…</span>
-                  </span>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-700">Saturday</span>
-                  <span className="text-[#1F2937] flex items-center gap-2">
-                    9:00 AM - 5:00 PM
-                    <span className="text-[#16A34A]">âœ…</span>
-                  </span>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-gray-700">Sunday</span>
-                  <span className="text-[#1F2937] flex items-center gap-2">
-                    Closed
-                    <span className="text-[#EF4444]">âŒ</span>
-                  </span>
-                </div>
-              </div>
+        .contact-method-card {
+          animation: gentleFloat 4s ease-in-out infinite;
+        }
 
-              {isWeekday() && (
-                <div className="mt-4 p-3 bg-[#16A34A] bg-opacity-10 rounded-lg text-center">
-                  <span className="text-[#16A34A]">ðŸŸ¢ We are currently Open</span>
-                </div>
-              )}
-            </div>
+        .contact-method-card:nth-child(1) { animation-delay: 0s; }
+        .contact-method-card:nth-child(2) { animation-delay: 1.3s; }
+        .contact-method-card:nth-child(3) { animation-delay: 2.6s; }
 
-            {/* Follow Us */}
-            <div className="bg-white rounded-2xl p-6 shadow-xl">
-              <h3 className="text-xl text-[#1F2937] mb-4">Follow Us</h3>
-              <div className="space-y-3">
-                <a href="#" className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-blue-50 transition-colors">
-                  <Facebook className="w-6 h-6 text-[#1877F2]" />
-                  <span className="text-gray-700">Facebook</span>
-                </a>
-                <a href="#" className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-pink-50 transition-colors">
-                  <Instagram className="w-6 h-6 text-[#E4405F]" />
-                  <span className="text-gray-700">Instagram</span>
-                </a>
-                <a href="#" className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-blue-50 transition-colors">
-                  <Linkedin className="w-6 h-6 text-[#0A66C2]" />
-                  <span className="text-gray-700">LinkedIn</span>
-                </a>
-                <a href="#" className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-red-50 transition-colors">
-                  <Youtube className="w-6 h-6 text-[#FF0000]" />
-                  <span className="text-gray-700">YouTube</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
+        .contact-method-card:hover {
+          animation-play-state: paused;
+        }
 
-        {/* FAQ Section */}
-        <div className="mb-16">
-          <h2 className="text-3xl lg:text-4xl text-[#1F2937] text-center mb-12">Frequently Asked Questions</h2>
-          <div className="max-w-4xl mx-auto space-y-4">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl border-2 shadow-lg overflow-hidden"
-                style={{ borderLeftColor: activeFaq === index ? '#2563EB' : 'transparent' }}
-              >
-                <button
-                  onClick={() => setActiveFaq(activeFaq === index ? null : index)}
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors"
-                >
-                  <span className="text-lg text-[#1F2937] pr-4">{faq.q}</span>
-                  <ChevronDown
-                    className={`w-6 h-6 text-gray-400 transition-transform flex-shrink-0 ${
-                      activeFaq === index ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                {activeFaq === index && (
-                  <div className="px-6 pb-6 text-gray-700 leading-relaxed">
-                    {faq.a}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        /* Responsive */
+        @media (max-width: 768px) {
+          .combined-card-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        /* FAQ Item Hover Effects */
+        .faq-item {
+          border: 1px solid #e2e8f0;
+          border-radius: 14px;
+          border-left: 3px solid transparent;
+          margin-bottom: 0.75rem;
+          overflow: hidden;
+          transition: border-left-color 0.25s ease, background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+          cursor: pointer;
+          background: #ffffff;
+        }
+
+        .faq-item:hover {
+          border-left-color: #f59e0b;
+          background: #fffbeb;
+          transform: translateX(4px);
+          box-shadow: 0 4px 12px rgba(245,158,11,0.15);
+        }
+
+        .faq-item.active {
+          border-left-color: #f59e0b;
+          background: #fffbeb;
+          box-shadow: 0 4px 16px rgba(245,158,11,0.12);
+        }
+      `}</style>
+
+      {/* Section 1 - Hero */}
+      <HeroSection />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Section 2 - Three Contact Cards */}
+        <ContactMethodCards />
+
+        {/* Section 3 - Combined Office + Branches Card */}
+        <CombinedOfficeAndBranches />
+
+        {/* Section 4 - Business Hours Card */}
+        <BusinessHoursCard />
+
+        {/* Section 5 - Send Us a Message Form */}
+        <ContactForm
+          formData={formData}
+          submitted={submitted}
+          submitting={submitting}
+          handleSubmit={handleSubmit}
+          handleFieldChange={handleFieldChange}
+        />
+
+        {/* Section 6 - FAQs */}
+        <FAQSection activeFaq={activeFaq} setActiveFaq={setActiveFaq} />
       </div>
 
-      {/* Bottom CTA Banner */}
-      <section
-        className="py-12 text-white text-center mb-16"
+      {/* Section 7 - Need Instant Help Banner */}
+      <InstantHelpBanner />
+    </div>
+  );
+}
+
+
+// Hero Section Component
+function HeroSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  return (
+    <section
+      ref={ref}
+      className="relative py-20 text-center"
+      style={{ background: '#f8fafc' }}
+    >
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Heading */}
+        <motion.h1
+          initial={{ y: 20, opacity: 0 }}
+          animate={isInView ? { y: 0, opacity: 1 } : {}}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="page-title mb-4"
+        >
+          Contact Us
+        </motion.h1>
+
+        {/* Decorative Line */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={isInView ? { scaleX: 1 } : {}}
+          transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
+          style={{
+            height: '3px',
+            width: '48px',
+            background: '#2563eb',
+            margin: '0 auto 1.5rem',
+            transformOrigin: 'left',
+          }}
+        />
+
+        {/* Subheading */}
+        <motion.p
+          initial={{ y: 20, opacity: 0 }}
+          animate={isInView ? { y: 0, opacity: 1 } : {}}
+          transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
+          style={{
+            fontSize: '1rem',
+            color: '#64748b',
+          }}
+        >
+          We're here to help you find the best loan deal
+        </motion.p>
+      </div>
+    </section>
+  );
+}
+
+
+// Contact Method Cards Component
+function ContactMethodCards() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
+
+  const cards = [
+    {
+      config: logoConfigs.call,
+      title: 'Call Us',
+      info: '7758 96 9798 / 9921 37 4565',
+      subInfo: 'Mon-Sat: 9AM to 7PM',
+      buttonText: 'Call Now',
+      link: 'tel:+917758969798',
+      borderColor: '#16a34a',
+      glowColor: 'rgba(22,163,74,0.20)',
+    },
+    {
+      config: logoConfigs.whatsapp,
+      title: 'WhatsApp Us',
+      info: '7758 96 9798',
+      subInfo: 'Quick response guaranteed',
+      buttonText: 'Chat Now',
+      link: 'https://wa.me/917758969798',
+      borderColor: '#25d366',
+      glowColor: 'rgba(37,211,102,0.20)',
+    },
+    {
+      config: logoConfigs.email,
+      title: 'Email Us',
+      info: 'sanskruti.sss1108@gmail.com',
+      subInfo: 'Reply within 24 hours',
+      buttonText: 'Send Email',
+      link: 'mailto:sanskruti.sss1108@gmail.com',
+      borderColor: '#2563eb',
+      glowColor: 'rgba(37,99,235,0.20)',
+    },
+  ];
+
+  return (
+    <div ref={ref} className="grid md:grid-cols-3 gap-6 mb-16">
+      {cards.map((card, index) => (
+        <motion.div
+          key={index}
+          initial={{ y: 40, opacity: 0 }}
+          animate={isInView ? { y: 0, opacity: 1 } : {}}
+          transition={{
+            delay: index * 0.1,
+            duration: 0.45,
+            ease: 'easeOut',
+          }}
+          className="contact-method-card contact-card-base"
+          style={{
+            '--card-border-color': card.borderColor,
+            '--card-glow-color': card.glowColor,
+            padding: '2rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.75rem',
+          }}
+        >
+          {/* Logo Circle */}
+          <motion.div whileHover={{ scale: 1.06 }} transition={{ duration: 0.3 }}>
+            <LogoCircle config={card.config} />
+          </motion.div>
+
+          {/* Card Title */}
+          <h3 className="card-title">{card.title}</h3>
+
+          {/* Card Data */}
+          <p className="card-data text-center">{card.info}</p>
+
+          {/* Card Support Text */}
+          <p className="card-support text-center">{card.subInfo}</p>
+
+          {/* Button */}
+          <motion.a
+            href={card.link}
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            style={{
+              display: 'block',
+              width: '100%',
+              padding: '0.75rem',
+              background: card.borderColor,
+              color: 'white',
+              borderRadius: '10px',
+              textAlign: 'center',
+              fontWeight: 600,
+              fontSize: '0.95rem',
+              textDecoration: 'none',
+              transition: 'all 0.25s ease',
+            }}
+          >
+            {card.buttonText}
+          </motion.a>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+
+// Combined Office and Branches Component
+function CombinedOfficeAndBranches() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.45 }}
+      className="mb-8 contact-card-base"
+      style={{
+        '--card-border-color': '#0891b2',
+        '--card-glow-color': 'rgba(8,145,178,0.18)',
+        maxWidth: '1000px',
+        margin: '0 auto 2rem',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        className="combined-card-grid"
         style={{
-          background: 'linear-gradient(135deg, #2563EB 0%, #1E40AF 100%)',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 0,
         }}
       >
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl mb-6">Need Instant Help?</h2>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+917758969798" className="flex items-center justify-center gap-2 bg-white text-[#2563EB] hover:bg-gray-100 px-10 py-4 rounded-lg transition-colors shadow-lg">
-              <Phone className="w-5 h-5" />
-              Call Now
-            </a>
-            <a href="https://wa.me/917758969798" className="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20BA5A] text-white px-10 py-4 rounded-lg transition-colors shadow-lg">
-              <MessageCircle className="w-5 h-5" />
-              WhatsApp
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-[#0f172a] text-gray-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div>
-              <div className="text-2xl text-white mb-4">Sanskruti Associates</div>
-              <p className="text-sm mb-6 leading-relaxed">
-                Your trusted partner for all loan solutions. We help you find the best deals from multiple banks with expert guidance.
-              </p>
-              <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-[#2563EB] rounded-lg flex items-center justify-center transition-colors">
-                  <Facebook className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-[#2563EB] rounded-lg flex items-center justify-center transition-colors">
-                  <Twitter className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-[#2563EB] rounded-lg flex items-center justify-center transition-colors">
-                  <Linkedin className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-[#2563EB] rounded-lg flex items-center justify-center transition-colors">
-                  <Instagram className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-white mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Our Services</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">EMI Calculator</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Apply Now</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Contact Us</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white mb-4">Loan Services</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Home Loan</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Personal & Personal & Business Loan</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Personal & Business Loan</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Car Loan</a></li>
-                <li><a href="#" className="hover:text-[#2563EB] transition-colors">Machinery Loan</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white mb-4">Contact Info</h4>
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-[#2563EB] flex-shrink-0 mt-0.5" />
-                  <span>Shop No. 11 Second Floor, Subhadra Mall, Front of Relince Smart MIDC, Baramati Dist-Pune 413133</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-[#2563EB] flex-shrink-0" />
-                  <a href="tel:+917758969798" className="hover:text-[#2563EB] transition-colors">+91 7758 96 9798</a>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-[#2563EB] flex-shrink-0" />
-                  <a href="mailto:sanskruti.sss1108@gmail.com" className="hover:text-[#2563EB] transition-colors">sanskruti.sss1108@gmail.com</a>
-                </li>
-              </ul>
-            </div>
+        {/* LEFT HALF - Our Office */}
+        <motion.div
+          initial={{ x: -40, opacity: 0 }}
+          animate={isInView ? { x: 0, opacity: 1 } : {}}
+          transition={{ duration: 0.45 }}
+          style={{
+            padding: '2rem',
+            borderRight: '1px solid #e2e8f0',
+          }}
+        >
+          {/* Header Row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+            <LogoCircle config={logoConfigs.office} size={75} objectFit="contain" />
+            <h3 className="section-heading">Our Office</h3>
           </div>
 
-          <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-            <div>Â© 2026 Sanskruti Associates. All rights reserved.</div>
-            <div className="flex gap-6">
-              <a href="#" className="hover:text-[#2563EB] transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-[#2563EB] transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-[#2563EB] transition-colors">Disclaimer</a>
-            </div>
+          {/* Address */}
+          <p style={{ fontSize: '0.875rem', color: '#64748b', lineHeight: 1.7, marginBottom: '1rem' }}>
+            Shop No. 11 Second Floor, Subhadra Mall, Front of Relince Smart MIDC, Baramati Dist-Pune 413133
+          </p>
+
+          {/* Map Placeholder */}
+          <div
+            style={{
+              borderRadius: '12px',
+              background: '#f1f5f9',
+              height: '140px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '1rem',
+            }}
+          >
+            <MapPin className="w-12 h-12" style={{ color: '#94a3b8' }} />
           </div>
-        </div>
-      </footer>
-    </div>
+
+          {/* Get Directions Button */}
+          <motion.button
+            onClick={() => openMap('baramati')}
+            whileHover={{
+              background: '#2563eb',
+              color: 'white',
+            }}
+            transition={{ duration: 0.25 }}
+            style={{
+              width: '100%',
+              padding: '0.6rem',
+              border: '1.5px solid #2563eb',
+              color: '#2563eb',
+              background: 'transparent',
+              borderRadius: '10px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.25s ease',
+            }}
+          >
+            Get Directions
+          </motion.button>
+        </motion.div>
+
+        {/* RIGHT HALF - Branches */}
+        <motion.div
+          initial={{ x: 40, opacity: 0 }}
+          animate={isInView ? { x: 0, opacity: 1 } : {}}
+          transition={{ delay: 0.1, duration: 0.45 }}
+          style={{
+            padding: '2rem',
+          }}
+        >
+          {/* Header Row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+            <LogoCircle config={logoConfigs.branches} size={75} />
+            <h3 className="section-heading">Our Branches</h3>
+          </div>
+
+          {/* Branch Rows */}
+          <div>
+            {branches.map((branch, index) => (
+              <motion.div
+                key={index}
+                initial={{ y: 10, opacity: 0 }}
+                animate={isInView ? { y: 0, opacity: 1 } : {}}
+                transition={{ delay: 0.2 + index * 0.07 }}
+                onClick={() => openMap(branch.name.toLowerCase())}
+                className="branch-row"
+                style={{
+                  marginBottom: '0.5rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <div style={{ flex: 1 }}>
+                  <div className="branch-name">
+                    {branch.name}
+                    <span style={{ fontSize: '0.7rem', color: '#94a3b8', marginLeft: '4px' }}>↗</span>
+                  </div>
+                  <div className="branch-address">{branch.address}</div>
+                </div>
+                <span className={branch.tag === 'HEAD OFFICE' ? 'badge-head-office' : 'badge-branch'}>
+                  {branch.tag}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+}
+
+
+// Business Hours Card Component
+function BusinessHoursCard() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
+
+  const schedules = [
+    { day: 'Mon–Fri', time: '9:00 AM - 7:00 PM', open: true },
+    { day: 'Saturday', time: '9:00 AM - 5:00 PM', open: true },
+    { day: 'Sunday', time: 'Closed', open: false },
+  ];
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ scale: 0.96, opacity: 0 }}
+      animate={isInView ? { scale: 1, opacity: 1 } : {}}
+      transition={{ duration: 0.4 }}
+      className="contact-card-base"
+      style={{
+        '--card-border-color': '#7c3aed',
+        '--card-glow-color': 'rgba(124,58,237,0.18)',
+        width: '60%',
+        maxWidth: '600px',
+        margin: '1.5rem auto 3rem',
+        padding: '1.75rem 2rem',
+        animation: 'gentleFloat 4s ease-in-out infinite',
+        animationDelay: '0.5s',
+      }}
+    >
+      {/* Header Row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem' }}>
+        <LogoCircle config={logoConfigs.businessHours} size={75} />
+        <h3 className="section-heading">Business Hours</h3>
+      </div>
+
+      {/* Hours Grid */}
+      <div>
+        {schedules.map((schedule, index) => (
+          <div
+            key={index}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '0.6rem 0',
+              borderBottom: index < schedules.length - 1 ? '1px solid #f1f5f9' : 'none',
+              fontSize: '0.875rem',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {/* Status Dot */}
+              <div
+                className={schedule.open ? 'status-dot open' : 'status-dot closed'}
+                style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: schedule.open ? '#16a34a' : '#dc2626',
+                }}
+              />
+              <span style={{ color: '#374151', fontWeight: 500 }}>{schedule.day}</span>
+            </div>
+            <span
+              style={{
+                color: schedule.open ? '#0f172a' : '#dc2626',
+                fontWeight: 600,
+              }}
+            >
+              {schedule.time}
+            </span>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+
+// Contact Form Component
+function ContactForm({ formData, submitted, submitting, handleSubmit, handleFieldChange }: any) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ y: 30, opacity: 0 }}
+      animate={isInView ? { y: 0, opacity: 1 } : {}}
+      transition={{ duration: 0.45 }}
+      className="contact-card-base"
+      style={{
+        '--card-border-color': '#10b981',
+        '--card-glow-color': 'rgba(16,185,129,0.18)',
+        maxWidth: '720px',
+        margin: '3rem auto',
+        padding: '2.5rem 3rem',
+      }}
+    >
+      {/* Section Heading */}
+      <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
+        Send Us a Message
+      </h2>
+      <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '2rem' }}>
+        We'll get back to you within 24 hours
+      </p>
+
+      <AnimatePresence mode="wait">
+        {!submitted ? (
+          <motion.form
+            key="form"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onSubmit={handleSubmit}
+          >
+            {/* Name Field */}
+            <motion.div
+              initial={{ y: 15, opacity: 0 }}
+              animate={isInView ? { y: 0, opacity: 1 } : {}}
+              transition={{ delay: 0.1 }}
+              style={{ marginBottom: '1.25rem' }}
+            >
+              <label className="form-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
+                Full Name *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => handleFieldChange('name', e.target.value)}
+                placeholder="Enter your full name"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '10px',
+                  fontSize: '0.9rem',
+                  color: '#0f172a',
+                  background: '#fafafa',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#2563eb';
+                  e.target.style.background = '#ffffff';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.background = '#fafafa';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </motion.div>
+
+            {/* Phone Field */}
+            <motion.div
+              initial={{ y: 15, opacity: 0 }}
+              animate={isInView ? { y: 0, opacity: 1 } : {}}
+              transition={{ delay: 0.16 }}
+              style={{ marginBottom: '1.25rem' }}
+            >
+              <label className="form-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
+                Phone Number *
+              </label>
+              <input
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={(e) => handleFieldChange('phone', e.target.value)}
+                placeholder="Enter your phone number"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '10px',
+                  fontSize: '0.9rem',
+                  color: '#0f172a',
+                  background: '#fafafa',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#2563eb';
+                  e.target.style.background = '#ffffff';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.background = '#fafafa';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </motion.div>
+
+            {/* Email Field */}
+            <motion.div
+              initial={{ y: 15, opacity: 0 }}
+              animate={isInView ? { y: 0, opacity: 1 } : {}}
+              transition={{ delay: 0.22 }}
+              style={{ marginBottom: '1.25rem' }}
+            >
+              <label className="form-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleFieldChange('email', e.target.value)}
+                placeholder="Enter your email"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '10px',
+                  fontSize: '0.9rem',
+                  color: '#0f172a',
+                  background: '#fafafa',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+                  outline: 'none',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#2563eb';
+                  e.target.style.background = '#ffffff';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.background = '#fafafa';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </motion.div>
+
+            {/* Two Column Grid for Loan Type and Amount */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
+              {/* Loan Type */}
+              <motion.div
+                initial={{ y: 15, opacity: 0 }}
+                animate={isInView ? { y: 0, opacity: 1 } : {}}
+                transition={{ delay: 0.28 }}
+              >
+                <label className="form-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
+                  Loan Type
+                </label>
+                <select
+                  value={formData.loanType}
+                  onChange={(e) => handleFieldChange('loanType', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '10px',
+                    fontSize: '0.9rem',
+                    color: '#0f172a',
+                    background: '#fafafa',
+                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+                    outline: 'none',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#2563eb';
+                    e.currentTarget.style.background = '#ffffff';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = '#e2e8f0';
+                    e.currentTarget.style.background = '#fafafa';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Select loan type</option>
+                  {services.map((service) => (
+                    <option key={service} value={service}>
+                      {service}
+                    </option>
+                  ))}
+                </select>
+              </motion.div>
+
+              {/* Loan Amount */}
+              <motion.div
+                initial={{ y: 15, opacity: 0 }}
+                animate={isInView ? { y: 0, opacity: 1 } : {}}
+                transition={{ delay: 0.34 }}
+              >
+                <label className="form-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
+                  Loan Amount
+                </label>
+                <select
+                  value={formData.loanAmount}
+                  onChange={(e) => handleFieldChange('loanAmount', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '10px',
+                    fontSize: '0.9rem',
+                    color: '#0f172a',
+                    background: '#fafafa',
+                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+                    outline: 'none',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#2563eb';
+                    e.currentTarget.style.background = '#ffffff';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = '#e2e8f0';
+                    e.currentTarget.style.background = '#fafafa';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Select amount</option>
+                  <option value="Under 5L">Under 5L</option>
+                  <option value="5L - 25L">5L - 25L</option>
+                  <option value="25L - 1Cr">25L - 1Cr</option>
+                  <option value="Above 1Cr">Above 1Cr</option>
+                </select>
+              </motion.div>
+            </div>
+
+            {/* Message Textarea */}
+            <motion.div
+              initial={{ y: 15, opacity: 0 }}
+              animate={isInView ? { y: 0, opacity: 1 } : {}}
+              transition={{ delay: 0.4 }}
+              style={{ marginBottom: '1.25rem' }}
+            >
+              <label className="form-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
+                Message
+              </label>
+              <textarea
+                value={formData.message}
+                onChange={(e) => handleFieldChange('message', e.target.value)}
+                rows={4}
+                placeholder="Tell us about your requirements..."
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '10px',
+                  fontSize: '0.9rem',
+                  color: '#0f172a',
+                  background: '#fafafa',
+                  transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+                  outline: 'none',
+                  resize: 'vertical',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#2563eb';
+                  e.target.style.background = '#ffffff';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.background = '#fafafa';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </motion.div>
+
+            {/* Submit Button */}
+            <motion.button
+              type="submit"
+              disabled={submitting}
+              whileHover={{
+                background: '#15803d',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 24px rgba(22,163,74,0.25)',
+              }}
+              whileTap={{ transform: 'translateY(0)' }}
+              style={{
+                width: '100%',
+                padding: '0.875rem',
+                background: '#16a34a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '0.95rem',
+                fontWeight: 700,
+                letterSpacing: '0.02em',
+                cursor: submitting ? 'not-allowed' : 'pointer',
+                transition: 'background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  Send Message
+                  <Send className="w-5 h-5" />
+                </>
+              )}
+            </motion.button>
+          </motion.form>
+        ) : (
+          <motion.div
+            key="success"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            style={{
+              textAlign: 'center',
+              padding: '3rem 0',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+              style={{
+                width: '80px',
+                height: '80px',
+                background: '#16a34a',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.5rem',
+              }}
+            >
+              <CheckCircle2 className="w-12 h-12 text-white" />
+            </motion.div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.5rem' }}>
+              Message Sent Successfully!
+            </h3>
+            <p style={{ color: '#64748b' }}>We'll get back to you within 24 hours</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+
+// FAQ Section Component
+function FAQSection({ activeFaq, setActiveFaq }: any) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ y: 30, opacity: 0 }}
+      animate={isInView ? { y: 0, opacity: 1 } : {}}
+      transition={{ duration: 0.45 }}
+      className="contact-card-base"
+      style={{
+        '--card-border-color': '#f59e0b',
+        '--card-glow-color': 'rgba(245,158,11,0.18)',
+        maxWidth: '800px',
+        margin: '0 auto 4rem',
+        padding: '2.5rem 3rem',
+      }}
+    >
+      {/* Heading */}
+      <motion.h2
+        initial={{ y: 20, opacity: 0 }}
+        animate={isInView ? { y: 0, opacity: 1 } : {}}
+        transition={{ duration: 0.4 }}
+        style={{
+          fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+          fontWeight: 800,
+          color: '#0f172a',
+          textAlign: 'center',
+          marginBottom: '0.5rem',
+        }}
+      >
+        Frequently Asked Questions
+      </motion.h2>
+
+      {/* Subheading */}
+      <motion.p
+        initial={{ y: 20, opacity: 0 }}
+        animate={isInView ? { y: 0, opacity: 1 } : {}}
+        transition={{ delay: 0.1, duration: 0.4 }}
+        style={{
+          textAlign: 'center',
+          color: '#64748b',
+          marginBottom: '2rem',
+        }}
+      >
+        Everything you need to know
+      </motion.p>
+
+      {/* FAQ Items */}
+      <div>
+        {faqs.map((faq, index) => (
+          <motion.div
+            key={index}
+            initial={{ y: 20, opacity: 0 }}
+            animate={isInView ? { y: 0, opacity: 1 } : {}}
+            transition={{ delay: 0.2 + index * 0.08 }}
+            className={`faq-item ${activeFaq === index ? 'active' : ''}`}
+          >
+            {/* Question Row */}
+            <motion.button
+              onClick={() => setActiveFaq(activeFaq === index ? null : index)}
+              style={{
+                width: '100%',
+                padding: '1.1rem 1.25rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer',
+                background: 'transparent',
+                border: 'none',
+                textAlign: 'left',
+              }}
+            >
+              <span className="faq-question" style={{ paddingRight: '1rem' }}>
+                {faq.q}
+              </span>
+              <motion.div
+                animate={{ rotate: activeFaq === index ? 180 : 0 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+              >
+                <ChevronDown className="w-6 h-6" style={{ color: activeFaq === index ? '#f59e0b' : '#9ca3af', flexShrink: 0 }} />
+              </motion.div>
+            </motion.button>
+
+            {/* Answer Panel */}
+            <AnimatePresence>
+              {activeFaq === index && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div
+                    style={{
+                      padding: '0 1.25rem 1.1rem',
+                      fontSize: '0.875rem',
+                      color: '#64748b',
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {faq.a}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+
+// Instant Help Banner Component
+function InstantHelpBanner() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
+
+  return (
+    <motion.section
+      ref={ref}
+      initial={{ y: 30, opacity: 0 }}
+      animate={isInView ? { y: 0, opacity: 1 } : {}}
+      transition={{ duration: 0.5 }}
+      style={{
+        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%)',
+        padding: '4rem 2rem',
+        textAlign: 'center',
+        position: 'relative',
+        overflow: 'hidden',
+        boxShadow: '0 20px 60px rgba(37,99,235,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
+      }}
+    >
+      {/* Animated Background Pattern */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 50%)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Content Container */}
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto' }}>
+        {/* Heading */}
+        <motion.h2
+          initial={{ y: 20, opacity: 0 }}
+          animate={isInView ? { y: 0, opacity: 1 } : {}}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          style={{
+            fontSize: 'clamp(2rem, 4vw, 2.75rem)',
+            fontWeight: 900,
+            color: 'white',
+            marginBottom: '0.75rem',
+            textShadow: '0 2px 20px rgba(0,0,0,0.2)',
+            letterSpacing: '-0.02em',
+          }}
+        >
+          Need Instant Help?
+        </motion.h2>
+
+        {/* Subheading */}
+        <motion.p
+          initial={{ y: 20, opacity: 0 }}
+          animate={isInView ? { y: 0, opacity: 1 } : {}}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          style={{
+            fontSize: '1.1rem',
+            color: 'rgba(255,255,255,0.95)',
+            marginBottom: '2.5rem',
+            fontWeight: 500,
+          }}
+        >
+          Our team is available Mon–Sat, 9AM to 7PM
+        </motion.p>
+
+        {/* Buttons */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={isInView ? { y: 0, opacity: 1 } : {}}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          style={{
+            display: 'flex',
+            gap: '1.25rem',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          {/* Call Now Button */}
+          <motion.a
+            href="tel:+917758969798"
+            whileHover={{
+              scale: 1.05,
+              y: -4,
+            }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              background: 'white',
+              color: '#1e40af',
+              padding: '1rem 2.5rem',
+              borderRadius: '14px',
+              fontWeight: 700,
+              fontSize: '1rem',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.625rem',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1)',
+              border: '2px solid rgba(255,255,255,0.2)',
+              cursor: 'pointer',
+            }}
+          >
+            <Phone className="w-5 h-5" />
+            Call Now
+          </motion.a>
+
+          {/* WhatsApp Button */}
+          <motion.a
+            href="https://wa.me/917758969798"
+            whileHover={{
+              scale: 1.05,
+              y: -4,
+            }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              background: 'linear-gradient(135deg, #25d366 0%, #20ba5a 100%)',
+              color: 'white',
+              padding: '1rem 2.5rem',
+              borderRadius: '14px',
+              fontWeight: 700,
+              fontSize: '1rem',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.625rem',
+              boxShadow: '0 8px 24px rgba(37,211,102,0.35), 0 2px 8px rgba(0,0,0,0.1)',
+              border: '2px solid rgba(255,255,255,0.2)',
+              cursor: 'pointer',
+            }}
+          >
+            <MessageCircle className="w-5 h-5" />
+            WhatsApp
+          </motion.a>
+        </motion.div>
+      </div>
+    </motion.section>
   );
 }
