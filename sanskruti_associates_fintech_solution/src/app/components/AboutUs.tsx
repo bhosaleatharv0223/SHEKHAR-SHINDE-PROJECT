@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import { Home as HomeIcon, Users, TrendingUp, Award, Building2, Zap, DollarSign, Headphones, Phone, MessageCircle, Star, ChevronRight, Mail, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
 
 const services = [
@@ -38,29 +39,353 @@ const testimonials = [
 ];
 
 export function AboutUs() {
+  const shimmerStyle = `
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(30deg); }
+      100% { transform: translateX(100vw) translateY(100vh) rotate(30deg); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(2deg); }
+    }
+    
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(34, 197, 94, 0.6), 0 0 60px rgba(34, 197, 94, 0.4); }
+    }
+    
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+    
+    .shine-effect {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .shine-effect::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shine 3s infinite;
+      pointer-events: none;
+    }
+    
+    .floating-card {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .glow-card {
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    
+    .sparkle {
+      animation: sparkle 2s ease-in-out infinite;
+    }
+  `;
+
   return (
     <div className="min-h-screen" style={{ background: '#EFF6FF' }}>
-      {/* Hero Banner */}
-      <section
-        className="relative h-[300px] flex items-center justify-center text-white overflow-hidden"
-        style={{
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)',
-        }}
-      >
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-20 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-20 w-80 h-80 bg-[#16A34A] rounded-full blur-3xl"></div>
+      <style>{shimmerStyle}</style>
+      
+      {/* Floating Sparkles */}
+      <div className="fixed inset-0 pointer-events-none z-50">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-yellow-400 rounded-full sparkle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 2}s`
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Premium Hero Banner */}
+      <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Layers */}
+        {/* Layer 1 - Background Image/Gradient */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/src/assets/images/about-bg.jpg"
+            alt="background"
+            className="w-full h-full object-cover object-center"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling?.removeAttribute('style');
+            }}
+          />
+          <div 
+            style={{ 
+              display: 'none',
+              background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 40%, #0f172a 70%, #16a34a 100%)'
+            }}
+            className="w-full h-full"
+          />
         </div>
 
-        <div className="relative z-10 text-center max-w-4xl px-4">
-          <div className="flex items-center justify-center gap-2 text-sm mb-4 text-blue-200">
-            <HomeIcon className="w-4 h-4" />
-            <span>Home</span>
-            <ChevronRight className="w-4 h-4" />
-            <span>About Us</span>
+        {/* Layer 2 - Dark Overlay */}
+        <div 
+          className="absolute inset-0 z-10"
+          style={{
+            background: 'linear-gradient(135deg, rgba(15,23,42,0.88) 0%, rgba(30,58,138,0.75) 50%, rgba(15,23,42,0.88) 100%)'
+          }}
+        />
+
+        {/* Layer 3 - Animated Particles/Glow */}
+        <div 
+          className="absolute top-20 left-20 w-96 h-96 rounded-full z-10 animate-pulse"
+          style={{
+            background: 'radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)',
+            animationDuration: '4s'
+          }}
+        />
+        <div 
+          className="absolute bottom-20 right-20 w-80 h-80 rounded-full z-10"
+          style={{
+            background: 'radial-gradient(circle, rgba(22,163,74,0.12) 0%, transparent 70%)',
+            animation: 'pulse 5s ease-in-out infinite alternate'
+          }}
+        />
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full z-10"
+          style={{
+            background: 'radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%)'
+          }}
+        />
+
+        {/* Main Content */}
+        <div className="relative z-20 flex flex-col items-center justify-center text-center px-4 py-20 w-full">
+          
+          {/* Step 1 - Animated Logo */}
+          <motion.div
+            initial={{ scale: 0, opacity: 0, rotate: -180 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            transition={{ 
+              duration: 1.2, 
+              ease: [0.34, 1.56, 0.64, 1],
+              delay: 0.2
+            }}
+            className="mb-8 relative"
+          >
+            <div className="relative w-28 h-28 md:w-36 md:h-36">
+              {/* Rotating ring around logo */}
+              <motion.div
+                className="absolute inset-0 rounded-full border-2 border-green-400/40"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                style={{
+                  borderTopColor: '#16a34a',
+                  borderRightColor: 'transparent',
+                  borderBottomColor: '#2563eb',
+                  borderLeftColor: 'transparent'
+                }}
+              />
+              
+              {/* Second ring (opposite direction) */}
+              <motion.div
+                className="absolute inset-2 rounded-full border border-blue-400/30"
+                animate={{ rotate: -360 }}
+                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                style={{
+                  borderTopColor: 'transparent',
+                  borderRightColor: '#2563eb',
+                  borderBottomColor: 'transparent',
+                  borderLeftColor: '#16a34a'
+                }}
+              />
+              
+              {/* Logo image center */}
+              <div className="absolute inset-4 rounded-full overflow-hidden bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                <div 
+                  className="w-full h-full flex items-center justify-center rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(34, 197, 94, 0.9) 0%, rgba(34, 197, 94, 0.7) 100%)'
+                  }}
+                >
+                  <div className="text-white font-bold text-lg flex flex-col items-center">
+                    <div className="text-xs">💰</div>
+                    <div>SA</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Pulsing glow behind logo */}
+              <motion.div
+                className="absolute inset-0 rounded-full -z-10"
+                animate={{ 
+                  scale: [1, 1.3, 1],
+                  opacity: [0.3, 0.1, 0.3]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                style={{
+                  background: 'radial-gradient(circle, rgba(22,163,74,0.4) 0%, transparent 70%)'
+                }}
+              />
+            </div>
+          </motion.div>
+
+          {/* Step 2 - Shimmer Badge above title */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+            className="mb-6"
+          >
+            <span 
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium text-white/90"
+              style={{
+                background: 'rgba(22,163,74,0.15)',
+                border: '1px solid rgba(22,163,74,0.35)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              Est. Since 2014 · Baramati, Maharashtra
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            </span>
+          </motion.div>
+
+          {/* Step 3 - Main Brand Name (Letter by letter) */}
+          <div className="flex flex-wrap justify-center mb-4">
+            {"Sanskruti Associates".split("").map((letter, i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 60, rotateX: -90 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{
+                  delay: 1.0 + i * 0.04,
+                  duration: 0.5,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+                className={`text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight ${
+                  letter === ' ' ? 'mx-2' : ''
+                }`}
+                style={{
+                  display: 'inline-block',
+                  background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #ffffff 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  textShadow: 'none'
+                }}
+              >
+                {letter === ' ' ? '\u00A0' : letter}
+              </motion.span>
+            ))}
           </div>
-          <h1 className="text-4xl lg:text-5xl mb-4">About Sanskruti Associates</h1>
-          <p className="text-xl text-blue-100">Your Trusted Loan Partner Ã¢â‚¬â€ Always With You</p>
+
+          {/* Step 5 - Tagline with typing effect */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.0, duration: 0.8 }}
+            className="mt-4 mb-8"
+          >
+            <p 
+              className="text-xl md:text-2xl lg:text-3xl font-light tracking-widest text-white/70"
+              style={{ letterSpacing: '0.15em' }}
+            >
+              Always With You
+            </p>
+            
+            {/* Animated underline below tagline */}
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: '100%' }}
+              transition={{ delay: 2.4, duration: 1.0 }}
+              className="h-px mt-3 mx-auto max-w-xs"
+              style={{
+                background: 'linear-gradient(90deg, transparent, #16a34a, #2563eb, transparent)'
+              }}
+            />
+          </motion.div>
+
+          {/* Step 6 - 3 trust badges animated */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.6, duration: 0.8 }}
+            className="flex flex-wrap justify-center gap-4 mt-6"
+          >
+            {/* Badge 1 */}
+            <div 
+              className="flex items-center gap-2 px-4 py-2 rounded-full"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <span className="text-green-400">✓</span>
+              <span className="text-white/80 text-sm">10+ Years Experience</span>
+            </div>
+            
+            {/* Badge 2 */}
+            <div 
+              className="flex items-center gap-2 px-4 py-2 rounded-full"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <span className="text-blue-400">✓</span>
+              <span className="text-white/80 text-sm">500+ Happy Customers</span>
+            </div>
+            
+            {/* Badge 3 */}
+            <div 
+              className="flex items-center gap-2 px-4 py-2 rounded-full"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <span className="text-green-400">✓</span>
+              <span className="text-white/80 text-sm">20+ Bank Partners</span>
+            </div>
+          </motion.div>
+
+          {/* Step 7 - Scroll down indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 3.2, duration: 0.6 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+          >
+            <span className="text-white/40 text-xs tracking-widest uppercase">Scroll</span>
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ 
+                duration: 1.5, 
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="w-5 h-8 rounded-full border border-white/20 flex items-start justify-center p-1"
+            >
+              <div className="w-1 h-2 rounded-full bg-white/40" />
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -95,7 +420,7 @@ export function AboutUs() {
                   <div className="text-sm text-gray-600">Bank Partners</div>
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded-xl">
-                  <div className="text-3xl text-[#2563EB] mb-1">Ã¢â€šÂ¹50Cr+</div>
+                  <div className="text-3xl text-[#2563EB] mb-1">₹50Cr+</div>
                   <div className="text-sm text-gray-600">Loans Disbursed</div>
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-xl">
@@ -105,9 +430,8 @@ export function AboutUs() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Stats Counter Section */}
+        </div>       
+ {/* Stats Counter Section */}
         <div className="bg-gradient-to-br from-blue-100 to-blue-50 rounded-3xl p-8 lg:p-12 mb-16">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
@@ -130,7 +454,7 @@ export function AboutUs() {
               <div className="w-20 h-20 bg-[#2563EB] rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-10 h-10 text-white" />
               </div>
-              <div className="text-4xl lg:text-5xl text-[#1F2937] mb-2">Ã¢â€šÂ¹50Cr+</div>
+              <div className="text-4xl lg:text-5xl text-[#1F2937] mb-2">₹50Cr+</div>
               <div className="text-sm text-gray-600">Disbursed</div>
             </div>
 
@@ -149,14 +473,29 @@ export function AboutUs() {
           <h2 className="text-3xl lg:text-4xl text-[#1F2937] text-center mb-12">Our Loan Services</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer border border-gray-100"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  rotateY: 5,
+                  boxShadow: "0 25px 50px rgba(0,0,0,0.15)"
+                }}
+                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 shine-effect floating-card glow-card"
+                style={{
+                  animationDelay: `${index * 0.5}s`
+                }}
               >
-                <div className="text-5xl mb-4">{service.icon}</div>
-                <h3 className="text-xl text-[#1F2937] mb-2">{service.name}</h3>
+                <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">{service.icon}</div>
+                <h3 className="text-xl text-[#1F2937] mb-2 group-hover:text-[#2563EB] transition-colors">{service.name}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{service.desc}</p>
-              </div>
+                
+                {/* Shine overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+              </motion.div>
             ))}
           </div>
         </div>
@@ -168,16 +507,36 @@ export function AboutUs() {
             {whyChooseUs.map((item, index) => {
               const Icon = item.icon;
               return (
-                <div key={index} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl transition-all">
-                  <div
+                <motion.div 
+                  key={index} 
+                  initial={{ opacity: 0, y: 50, rotateY: -15 }}
+                  whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.15, duration: 0.6 }}
+                  whileHover={{ 
+                    scale: 1.08, 
+                    rotateY: 10,
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.15)"
+                  }}
+                  className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl transition-all shine-effect floating-card glow-card"
+                  style={{
+                    animationDelay: `${index * 0.8}s`
+                  }}
+                >
+                  <motion.div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
                     style={{ background: `${item.color}15` }}
+                    whileHover={{ rotate: 360, scale: 1.1 }}
+                    transition={{ duration: 0.6 }}
                   >
                     <Icon className="w-8 h-8" style={{ color: item.color }} />
-                  </div>
+                  </motion.div>
                   <h3 className="text-xl text-[#1F2937] mb-3">{item.title}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
-                </div>
+                  
+                  {/* Enhanced shine overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-2xl" />
+                </motion.div>
               );
             })}
           </div>
@@ -332,7 +691,7 @@ export function AboutUs() {
           </div>
 
           <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-            <div>Ã‚Â© 2026 Sanskruti Associates. All rights reserved.</div>
+            <div>© 2026 Sanskruti Associates. All rights reserved.</div>
             <div className="flex gap-6">
               <a href="#" className="hover:text-[#2563EB] transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-[#2563EB] transition-colors">Terms of Service</a>
