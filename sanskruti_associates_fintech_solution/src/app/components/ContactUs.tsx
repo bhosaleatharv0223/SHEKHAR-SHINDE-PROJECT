@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
 import { Phone, MessageCircle, Mail, MapPin, ChevronDown, Send, Loader2, CheckCircle2 } from 'lucide-react';
 
@@ -133,7 +133,7 @@ const LogoCircle = ({ config, size = 88, objectFit = 'cover' }: { config: Contac
         flexShrink: 0,
         background: '#ffffff',
         border: '2px solid #e2e8f0',
-        transition: 'transform 0.3s ease',
+        transition: 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
       }}
     >
       <img
@@ -150,6 +150,25 @@ const LogoCircle = ({ config, size = 88, objectFit = 'cover' }: { config: Contac
       />
     </div>
   );
+};
+
+// Typewriter hook
+const useTypewriter = (text: string, delay: number = 600) => {
+  const [displayed, setDisplayed] = useState('');
+  
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      let i = 0;
+      const interval = setInterval(() => {
+        setDisplayed(text.slice(0, ++i));
+        if (i >= text.length) clearInterval(interval);
+      }, 32);
+      return () => clearInterval(interval);
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, [text, delay]);
+  
+  return displayed;
 };
 
 export function ContactUs() {
@@ -250,6 +269,19 @@ export function ContactUs() {
           text-transform: uppercase;
         }
 
+        /* Typewriter cursor blink */
+        @keyframes cursorBlink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+        
+        .cursor-blink {
+          animation: cursorBlink 0.8s ease infinite;
+          color: #2563eb;
+          font-weight: 300;
+          margin-left: 2px;
+        }
+
         /* Unified Border System for ALL Cards */
         .contact-card-base {
           border: 2px solid var(--card-border-color);
@@ -291,13 +323,32 @@ export function ContactUs() {
             0 4px 8px rgba(0,0,0,0.15);
         }
 
+        /* Logo reaction on card hover */
+        .contact-card-base:hover .logo-circle {
+          transform: scale(1.1) translateY(-3px);
+          transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Button ripple effect */
+        @keyframes ripple {
+          to { 
+            transform: scale(3.5); 
+            opacity: 0; 
+          }
+        }
+
+        .btn-ripple {
+          position: relative;
+          overflow: hidden;
+        }
+
         /* Branch Row Hover Effects */
         .branch-row {
           border: 1px solid #e2e8f0;
           border-radius: 10px;
           border-left: 3px solid transparent;
           padding: 0.75rem 1rem;
-          transition: border-left-color 0.25s ease, background 0.25s ease, transform 0.2s ease;
+          transition: border-left-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
           cursor: pointer;
         }
 
@@ -334,6 +385,31 @@ export function ContactUs() {
           border: 1px solid #e2e8f0;
         }
 
+        /* Status dot pulse - open days only */
+        @keyframes statusPulse {
+          0%, 100% { 
+            box-shadow: 0 0 0 0 rgba(22,163,74,0.5); 
+          }
+          50% { 
+            box-shadow: 0 0 0 5px rgba(22,163,74,0); 
+          }
+        }
+
+        .status-dot-open {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #16a34a;
+          animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        .status-dot-closed {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #dc2626;
+        }
+
         /* Gentle Float Animation */
         @keyframes gentleFloat {
           0%, 100% { transform: translateY(0px); }
@@ -350,6 +426,23 @@ export function ContactUs() {
 
         .contact-method-card:hover {
           animation-play-state: paused;
+        }
+
+        /* Button spinner */
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+          display: inline-block;
+          width: 14px;
+          height: 14px;
+          border: 2px solid rgba(255,255,255,0.4);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: spin 0.7s linear infinite;
+          vertical-align: middle;
+          margin-right: 6px;
         }
 
         /* Responsive */
@@ -382,6 +475,24 @@ export function ContactUs() {
           border-left-color: #f59e0b;
           background: #fffbeb;
           box-shadow: 0 4px 16px rgba(245,158,11,0.12);
+        }
+
+        .faq-question-row:hover {
+          background: rgba(255, 251, 235, 0.5);
+          transition: background 0.2s ease;
+        }
+
+        .faq-question-row:hover .faq-question {
+          color: #f59e0b;
+          transition: color 0.2s ease;
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+          }
         }
       `}</style>
 
@@ -422,6 +533,8 @@ export function ContactUs() {
 function HeroSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
+  const words = "Contact Us".split(" ");
+  const subheading = useTypewriter("We're here to help you find the best loan deal", 600);
 
   return (
     <section
@@ -430,42 +543,51 @@ function HeroSection() {
       style={{ background: '#f8fafc' }}
     >
       <div className="max-w-4xl mx-auto px-4">
-        {/* Heading */}
-        <motion.h1
-          initial={{ y: 20, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : {}}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="page-title mb-4"
-        >
-          Contact Us
-        </motion.h1>
+        {/* Heading - Word Reveal */}
+        <h1 className="page-title mb-4">
+          {words.map((word, i) => (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, y: 24 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ 
+                duration: 0.45, 
+                delay: i * 0.12, 
+                ease: [0.22, 1, 0.36, 1] 
+              }}
+              style={{ display: 'inline-block', marginRight: '0.3em' }}
+            >
+              {word}
+            </motion.span>
+          ))}
+        </h1>
 
-        {/* Decorative Line */}
+        {/* Decorative Line - Draws after heading */}
         <motion.div
           initial={{ scaleX: 0 }}
           animate={isInView ? { scaleX: 1 } : {}}
-          transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
+          transition={{ 
+            duration: 0.5, 
+            delay: 0.4, 
+            ease: [0.22, 1, 0.36, 1] 
+          }}
           style={{
             height: '3px',
             width: '48px',
             background: '#2563eb',
+            borderRadius: '2px',
             margin: '0 auto 1.5rem',
             transformOrigin: 'left',
           }}
         />
 
-        {/* Subheading */}
-        <motion.p
-          initial={{ y: 20, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : {}}
-          transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
-          style={{
-            fontSize: '1rem',
-            color: '#64748b',
-          }}
-        >
-          We're here to help you find the best loan deal
-        </motion.p>
+        {/* Subheading - Typewriter Effect */}
+        <p style={{ fontSize: '1rem', color: '#64748b' }}>
+          {subheading}
+          {subheading.length < "We're here to help you find the best loan deal".length && (
+            <span className="cursor-blink">|</span>
+          )}
+        </p>
       </div>
     </section>
   );
@@ -510,18 +632,62 @@ function ContactMethodCards() {
     },
   ];
 
+  // 3D Tilt effect
+  const handleTilt = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const { left, top, width, height } = el.getBoundingClientRect();
+    const x = ((e.clientX - left) / width - 0.5) * 14;
+    const y = ((e.clientY - top) / height - 0.5) * -14;
+    el.style.transform = `perspective(900px) rotateY(${x}deg) rotateX(${y}deg) translateY(-8px) scale(1.03)`;
+    el.style.transition = 'transform 0.1s ease';
+  };
+
+  const resetTilt = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.transform = '';
+    e.currentTarget.style.transition = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+  };
+
+  // Ripple effect
+  const triggerRipple = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const btn = e.currentTarget;
+    const circle = document.createElement('span');
+    const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+    const radius = diameter / 2;
+    const rect = btn.getBoundingClientRect();
+    
+    circle.style.cssText = `
+      position: absolute;
+      width: ${diameter}px;
+      height: ${diameter}px;
+      left: ${e.clientX - rect.left - radius}px;
+      top: ${e.clientY - rect.top - radius}px;
+      background: rgba(255,255,255,0.35);
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 0.55s linear forwards;
+      pointer-events: none;
+    `;
+    
+    btn.style.position = 'relative';
+    btn.style.overflow = 'hidden';
+    btn.appendChild(circle);
+    setTimeout(() => circle.remove(), 550);
+  };
+
   return (
-    <div ref={ref} className="grid md:grid-cols-3 gap-6 mb-16">
+    <div ref={ref} className="grid md:grid-cols-3 gap-6 mb-16" style={{ perspective: '1200px' }}>
       {cards.map((card, index) => (
         <motion.div
           key={index}
-          initial={{ y: 40, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : {}}
+          initial={{ opacity: 0, y: -50, rotateX: -12 }}
+          animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
           transition={{
-            delay: index * 0.1,
-            duration: 0.45,
-            ease: 'easeOut',
+            delay: index * 0.12,
+            duration: 0.55,
+            ease: [0.22, 1, 0.36, 1],
           }}
+          onMouseMove={handleTilt}
+          onMouseLeave={resetTilt}
           className="contact-method-card contact-card-base"
           style={{
             '--card-border-color': card.borderColor,
@@ -534,9 +700,9 @@ function ContactMethodCards() {
           }}
         >
           {/* Logo Circle */}
-          <motion.div whileHover={{ scale: 1.06 }} transition={{ duration: 0.3 }}>
+          <div>
             <LogoCircle config={card.config} />
-          </motion.div>
+          </div>
 
           {/* Card Title */}
           <h3 className="card-title">{card.title}</h3>
@@ -547,11 +713,13 @@ function ContactMethodCards() {
           {/* Card Support Text */}
           <p className="card-support text-center">{card.subInfo}</p>
 
-          {/* Button */}
+          {/* Button with Ripple */}
           <motion.a
             href={card.link}
+            onClick={triggerRipple}
             whileHover={{ scale: 1.03, y: -2 }}
             whileTap={{ scale: 0.96 }}
+            className="btn-ripple"
             style={{
               display: 'block',
               width: '100%',
@@ -753,8 +921,15 @@ function BusinessHoursCard() {
       {/* Hours Grid */}
       <div>
         {schedules.map((schedule, index) => (
-          <div
+          <motion.div
             key={index}
+            initial={{ opacity: 0, x: -16 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ 
+              delay: 0.15 + index * 0.1, 
+              duration: 0.3, 
+              ease: 'easeOut' 
+            }}
             style={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -764,15 +939,9 @@ function BusinessHoursCard() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {/* Status Dot */}
+              {/* Status Dot with Pulse */}
               <div
-                className={schedule.open ? 'status-dot open' : 'status-dot closed'}
-                style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  background: schedule.open ? '#16a34a' : '#dc2626',
-                }}
+                className={schedule.open ? 'status-dot-open' : 'status-dot-closed'}
               />
               <span style={{ color: '#374151', fontWeight: 500 }}>{schedule.day}</span>
             </div>
@@ -784,7 +953,7 @@ function BusinessHoursCard() {
             >
               {schedule.time}
             </span>
-          </div>
+          </motion.div>
         ))}
       </div>
     </motion.div>
@@ -965,23 +1134,45 @@ function ContactForm({ formData, submitted, submitting, handleSubmit, handleFiel
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
+                    paddingRight: '2.5rem',
                     border: '1.5px solid #e2e8f0',
                     borderRadius: '10px',
                     fontSize: '0.9rem',
-                    color: '#0f172a',
-                    background: '#fafafa',
-                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+                    color: formData.loanType ? '#0f172a' : '#9ca3af',
+                    background: '#fafafa url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%239ca3af\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E") no-repeat right 1rem center',
+                    backgroundSize: '12px',
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     outline: 'none',
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = '#2563eb';
-                    e.currentTarget.style.background = '#ffffff';
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10)';
+                    e.currentTarget.style.background = '#ffffff url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%232563eb\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E") no-repeat right 1rem center';
+                    e.currentTarget.style.backgroundSize = '12px';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10), 0 4px 12px rgba(37,99,235,0.15)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = '#e2e8f0';
-                    e.currentTarget.style.background = '#fafafa';
+                    e.currentTarget.style.background = '#fafafa url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%239ca3af\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E") no-repeat right 1rem center';
+                    e.currentTarget.style.backgroundSize = '12px';
                     e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                  onMouseEnter={(e) => {
+                    if (document.activeElement !== e.currentTarget) {
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (document.activeElement !== e.currentTarget) {
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }
                   }}
                 >
                   <option value="">Select loan type</option>
@@ -1008,23 +1199,45 @@ function ContactForm({ formData, submitted, submitting, handleSubmit, handleFiel
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem',
+                    paddingRight: '2.5rem',
                     border: '1.5px solid #e2e8f0',
                     borderRadius: '10px',
                     fontSize: '0.9rem',
-                    color: '#0f172a',
-                    background: '#fafafa',
-                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+                    color: formData.loanAmount ? '#0f172a' : '#9ca3af',
+                    background: '#fafafa url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%239ca3af\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E") no-repeat right 1rem center',
+                    backgroundSize: '12px',
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     outline: 'none',
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = '#2563eb';
-                    e.currentTarget.style.background = '#ffffff';
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10)';
+                    e.currentTarget.style.background = '#ffffff url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%232563eb\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E") no-repeat right 1rem center';
+                    e.currentTarget.style.backgroundSize = '12px';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.10), 0 4px 12px rgba(37,99,235,0.15)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = '#e2e8f0';
-                    e.currentTarget.style.background = '#fafafa';
+                    e.currentTarget.style.background = '#fafafa url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'%239ca3af\' d=\'M6 9L1 4h10z\'/%3E%3C/svg%3E") no-repeat right 1rem center';
+                    e.currentTarget.style.backgroundSize = '12px';
                     e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                  onMouseEnter={(e) => {
+                    if (document.activeElement !== e.currentTarget) {
+                      e.currentTarget.style.borderColor = '#cbd5e1';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (document.activeElement !== e.currentTarget) {
+                      e.currentTarget.style.borderColor = '#e2e8f0';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }
                   }}
                 >
                   <option value="">Select amount</option>
@@ -1076,20 +1289,20 @@ function ContactForm({ formData, submitted, submitting, handleSubmit, handleFiel
               />
             </motion.div>
 
-            {/* Submit Button */}
+            {/* Submit Button with State Transitions */}
             <motion.button
               type="submit"
               disabled={submitting}
-              whileHover={{
-                background: '#15803d',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 24px rgba(22,163,74,0.25)',
-              }}
-              whileTap={{ transform: 'translateY(0)' }}
+              whileHover={!submitting ? {
+                scale: 1.01,
+                y: -2,
+              } : {}}
+              whileTap={!submitting ? { scale: 0.98 } : {}}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
               style={{
                 width: '100%',
                 padding: '0.875rem',
-                background: '#16a34a',
+                background: submitting ? '#9ca3b8' : '#16a34a',
                 color: 'white',
                 border: 'none',
                 borderRadius: '12px',
@@ -1097,24 +1310,38 @@ function ContactForm({ formData, submitted, submitting, handleSubmit, handleFiel
                 fontWeight: 700,
                 letterSpacing: '0.02em',
                 cursor: submitting ? 'not-allowed' : 'pointer',
-                transition: 'background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease',
+                transition: 'background 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.5rem',
               }}
             >
-              {submitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  Send Message
-                  <Send className="w-5 h-5" />
-                </>
-              )}
+              <AnimatePresence mode="wait">
+                {submitting ? (
+                  <motion.span
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  >
+                    <span className="spinner" />
+                    Sending...
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="idle"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  >
+                    Send Message
+                    <Send className="w-5 h-5" />
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </motion.button>
           </motion.form>
         ) : (
@@ -1218,8 +1445,9 @@ function FAQSection({ activeFaq, setActiveFaq }: any) {
             className={`faq-item ${activeFaq === index ? 'active' : ''}`}
           >
             {/* Question Row */}
-            <motion.button
+            <button
               onClick={() => setActiveFaq(activeFaq === index ? null : index)}
+              className="faq-question-row"
               style={{
                 width: '100%',
                 padding: '1.1rem 1.25rem',
@@ -1241,16 +1469,20 @@ function FAQSection({ activeFaq, setActiveFaq }: any) {
               >
                 <ChevronDown className="w-6 h-6" style={{ color: activeFaq === index ? '#f59e0b' : '#9ca3af', flexShrink: 0 }} />
               </motion.div>
-            </motion.button>
+            </button>
 
-            {/* Answer Panel */}
-            <AnimatePresence>
+            {/* Answer Panel - Smooth Accordion */}
+            <AnimatePresence initial={false}>
               {activeFaq === index && (
                 <motion.div
+                  key="answer"
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: 'easeInOut' }}
+                  transition={{ 
+                    duration: 0.32, 
+                    ease: [0.22, 1, 0.36, 1] 
+                  }}
                   style={{ overflow: 'hidden' }}
                 >
                   <div
@@ -1309,11 +1541,8 @@ function InstantHelpBanner() {
 
       {/* Content Container */}
       <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Heading */}
-        <motion.h2
-          initial={{ y: 20, opacity: 0 }}
-          animate={isInView ? { y: 0, opacity: 1 } : {}}
-          transition={{ delay: 0.2, duration: 0.5 }}
+        {/* Heading - Word Pop-In Animation */}
+        <h2
           style={{
             fontSize: 'clamp(2rem, 4vw, 2.75rem)',
             fontWeight: 900,
@@ -1323,8 +1552,23 @@ function InstantHelpBanner() {
             letterSpacing: '-0.02em',
           }}
         >
-          Need Instant Help?
-        </motion.h2>
+          {"Need Instant Help?".split(" ").map((word, i) => (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={isInView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ 
+                delay: 0.1 + i * 0.1, 
+                type: 'spring', 
+                stiffness: 200, 
+                damping: 20 
+              }}
+              style={{ display: 'inline-block', marginRight: '0.3em' }}
+            >
+              {word}
+            </motion.span>
+          ))}
+        </h2>
 
         {/* Subheading */}
         <motion.p
